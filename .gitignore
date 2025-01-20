@@ -1,0 +1,13 @@
+__pycache__
+.idea/
+venv/
+historical
+backups
+tests/downloaded_images
+database_handler/downloaded_images
+data_files/
+**/*.ods
+**/*.xml
+*.db*
+auto_record/
+static/card_images/*.jpg

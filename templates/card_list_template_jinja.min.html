@@ -1,0 +1,6 @@
+<div class="col-md-12"><div class="card mb-3" style="background-color:Linen;"><div class="card-header">Data</div><div class="row g-0"><div class="col-md-4"><div class="card-body"><p class="card-text">You're doing a good job. You can take a break. I love you.</p></div></div><div class="col-md-4"><div class="card-body"><p class="card-text">Have Cards: {{ meta_data["count_have"] }}</p><p class="card-text">Want Cards: {{ meta_data["count_want"] }}</p><p class="card-text">Total Cards: {{ meta_data["count_cards"] }}</p><p class="card-text">Complete: {{ meta_data["percent_complete"] }}%</p></div></div><div class="col-md-4"><div class="card-body"><p class="card-text">Have: ${{ meta_data["price_have"] }}</p><p class="card-text">Want: ${{ meta_data["price_want"] }}</p><p class="card-text">Total: ${{ meta_data["sum_price"] }}</p></div></div></div></div></div>
+{% if 'set_card_list' in meta_data %}
+{% for card_data in meta_data['set_card_list'] %}
+{% include 'card_template_jinja.html' %}
+{% endfor %}
+{% endif %}

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><title>Pokemon Cards</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="shortcut icon" href="#">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') | safe }}">
+</head>
+<body>
+<!-- Top Navbar -->
+<nav class="navbar fixed-top navbar-expand-lg bg-dark" data-bs-theme="dark">
+    <div class="container-fluid"><a class="navbar-brand" href="/">&#x1F422;&#x1F995;</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            </ul>
+            <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
+            </ul>
+        </div>
+    </div>
+</nav>
+<div id="mediaContentSelectDiv" class="main-content-container container-fluid">
+    <div class="row">
+        <div class="col-sm-2">
+            <div class="card sticky-top mb-3" style="background-color:Linen;">
+                <div class="card-header">
+                    Filters
+                </div>
+                <div class="card-body">
+                    <button type="button" class="btn btn-primary" onclick="generatePackButton()">Generate Pack</button>
+                </div>
+                <ul class="list-group list-group-flush">
+                </ul>
+                <div class="card-body">
+                    <h5 class="card-title" id="filter_ownership" hidden="hidden">want</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1"
+                               value="option1" onchange="javascript:applyFilterOwnership('')">
+                        <label class="form-check-label" for="exampleRadios1">
+                            All
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2"
+                               value="option2" onchange="javascript:applyFilterOwnership('have')">
+                        <label class="form-check-label" for="exampleRadios2">
+                            Have
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3"
+                               value="option3" checked onchange="javascript:applyFilterOwnership('want')">
+                        <label class="form-check-label" for="exampleRadios3">
+                            Want
+                        </label>
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush">
+                </ul>
+                <div class="card-body">
+                    <h5 class="card-title" id="sort_by_selected_item">Sets</h5>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Sort by
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="javascript:applySortFilter('Sets')">Sets</a></li>
+                            <li><a class="dropdown-item" href="javascript:applySortFilter('Sets Reverse')">Sets
+                                Reverse</a></li>
+                            <li><a class="dropdown-item" href="javascript:applySortFilter('Card Index')">Card
+                                Index</a></li>
+                            <li><a class="dropdown-item" href="javascript:applySortFilter('Card Index Reverse')">Card
+                                Index Reverse</a></li>
+                            <li><a class="dropdown-item" href="javascript:applySortFilter('A-Z')">A-Z</a></li>
+                            <li><a class="dropdown-item" href="javascript:applySortFilter('Z-A')">Z-A</a></li>
+                            <li><a class="dropdown-item" href="javascript:applySortFilter('Price: Low - High')">Price:
+                                Low - High</a></li>
+                            <li><a class="dropdown-item" href="javascript:applySortFilter('Price: High - Low')">Price:
+                                High - Low</a></li>
+                            <li><a class="dropdown-item" href="javascript:applySortFilter('Have')">Have</a></li>
+                            <li><a class="dropdown-item" href="javascript:applySortFilter('Want')">Want</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush">
+                </ul>
+                <div id="metadata_card_body" class="card-body">
+                    <h5 class="card-title" id="primary_card_set_title">{{ python_metadata.get('set_name', '') }}</h5>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false"
+                                id="set_select_dropdown">
+                            Set list
+                        </button>
+                        <ul class="dropdown-menu" style="height:400px; overflow-y:auto;">
+                            <li><a class="dropdown-item"
+                                   href="javascript:getSetCardList('')">All</a></li>
+                            {% for set_data in python_metadata['set_list']: %}
+                            <li><a class="dropdown-item"
+                                   href="javascript:getSetCardList('{{ set_data.get('set_name') }}')">{{
+                                set_data['set_name'] }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush">
+                </ul>
+                <div class="card-body">
+                    <h5 class="card-title">Search Cards</h5>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Mudkip"
+                               aria-label="Search card names" aria-describedby="button-addon2"
+                               id="card_name_search_query_text_field" onclick="javascript:this.select()"
+                               oninput="javascript:applySearchTerm()">
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush">
+                </ul>
+                <div class="card-body">
+                    <h5 class="card-title">Search Sets</h5>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Neo Genesis"
+                               aria-label="Search card names" aria-describedby="button-addon2"
+                               id="card_season_search_query_text_field" onclick="javascript:this.select()"
+                               onchange="javascript:applySeasonSearchTerm()">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-10">
+            <div class="row">
+                <div class="col-md-12" id="rainbow_loading_bar">
+                    <div class="spinner-grow" role="status" style="color: red;">
+                    </div>
+                    <div class="spinner-grow" role="status" style="color: orange;">
+                    </div>
+                    <div class="spinner-grow" role="status" style="color: yellow;">
+                    </div>
+                    <div class="spinner-grow" role="status" style="color: green;">
+                    </div>
+                    <div class="spinner-grow" role="status" style="color: blue;">
+                    </div>
+                    <div class="spinner-grow" role="status" style="color: purple;">
+                    </div>
+                    <div class="spinner-grow" role="status" style="color: pink;">
+                    </div>
+                    <div class="spinner-grow" role="status" style="color: cyan;">
+                    </div>
+                </div>
+            </div>
+            <div id="card_container" class="row gx-2 gy-2">
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript" src="{{ url_for('static', filename='app.js') }}"></script>
+<script type="text/javascript" language="javascript"
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script type="text/javascript" language="javascript"
+        src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+<script type="text/javascript" language="javascript"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+</body>
+</html>
