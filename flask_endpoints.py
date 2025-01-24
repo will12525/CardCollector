@@ -9,6 +9,7 @@ from database_handler import common_objects
 from database_handler.common_objects import DBType
 from database_handler.db_getter import DatabaseHandler
 from database_handler.db_setter import DBCreator
+
 # from database_handler.input_file_parser import load_set_data_dir
 
 # USERS
@@ -81,18 +82,23 @@ def get_set_card_list_html():
     meta_data = {}
     if json_request := request.get_json():
         with DatabaseHandler() as db_getter_connection:
+            print(json_request)
             meta_data.update(
-                db_getter_connection.query_cards(
-                    json_request.get(common_objects.SET_NAME_COLUMN),
+                db_getter_connection.query_collection(
+                    json_request.get(
+                        common_objects.SET_NAME_COLUMN,
+                        common_objects.get_set_name_from_index(1),
+                    ),
                     json_request.get("filter_str"),
                     json_request.get("card_name_search_query"),
                     json_request.get("filter_ownership"),
                     json_request.get("card_season_search_query"),
+                    1,
                 )
             )
-
+    print(meta_data)
     return render_template(
-        "card_list_template_jinja.min.html",
+        "card_list_template_jinja.html",
         meta_data=meta_data,
     )
 
@@ -103,12 +109,13 @@ def get_set_card_list():
     if json_request := request.get_json():
         with DatabaseHandler() as db_getter_connection:
             data.update(
-                db_getter_connection.query_cards(
+                db_getter_connection.query_collection(
                     json_request.get(common_objects.SET_NAME_COLUMN),
                     json_request.get("filter_str"),
                     json_request.get("card_name_search_query"),
                     json_request.get("filter_ownership"),
                     json_request.get("card_season_search_query"),
+                    1,
                 )
             )
             data["set_list"] = db_getter_connection.get_sets()
@@ -121,14 +128,27 @@ def generate_pack():
     # {"card_count": 10, "set_name": json_request.get(common_objects.SET_NAME_COLUMN)}
 
     if json_request := request.get_json():
+        print(f"generate_pack: {json_request}")
         with DatabaseHandler() as db_getter_connection:
+            # Generate the pack
             data["set_card_list"] = db_getter_connection.generate_pack_from_set(
-                    {"card_count": 10, "set_name": "Base Set (Shadowless)"}
-                )
+                {"card_count": 10, "set_name": "Base Set (Shadowless)"}
+            )
             data["set_list"] = db_getter_connection.get_sets()
+            # Update user collection with the new pack data
+            for card in data["set_card_list"]:
+                db_getter_connection.set_have(
+                    {
+                        common_objects.OWN_COUNT_COLUMN: 1,
+                        common_objects.CARD_ID_COLUMN: card.get(
+                            common_objects.ID_COLUMN
+                        ),
+                        common_objects.USER_ID_COLUMN: 1,
+                    }
+                )
 
     return render_template(
-        "card_list_template_jinja.min.html",
+        "card_list_template_jinja.html",
         meta_data=data,
     )
 

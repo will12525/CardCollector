@@ -1,4 +1,4 @@
-<div class="col-sm-4 my-class">
+<div class="col-lg-3 my-class">
     <div class="card my-content-card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <a id="card_header_title"
@@ -6,55 +6,27 @@
                target="_blank" rel="noopener noreferrer">{{ card_data["card_name"] }}</a>
             <div data-mdb-input-init class="form-outline">
                 <span>#</span>
+                {% if card_data['card_index'] %}
                 <input type="number" class="input_sizing card_index_input_class"
-                       data-extra-data="{{ card_data['tcgp_id'] }}" placeholder="0"
-                       value="{{ card_data['card_index'] }}" onchange="update_card_index(event)">
+                       data-extra-data="{{ card_data['tcgp_id'] }}"
+                       value="{{ card_data.get('card_index', 0) }}" onchange="update_card_index(event)">
+                {% else %}
+                <input type="number" class="input_sizing card_index_input_class"
+                       data-extra-data="{{ card_data['tcgp_id'] }}" onchange="update_card_index(event)">
+                {% endif %}
             </div>
         </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <img id="card_image" class="img-fluid" loading="lazy"
-                         src="/static/card_images/{{ card_data['tcgp_id'] }}.jpg" onerror="apply_default_image(this)">
-                </div>
-                <div class="col-md-6">
-                    <h5 id="card_name" class="card-title">{{ card_data["card_name"] }}</h5>
-                    <h6 id="card_set" class="card-subtitle mb-2 text-body-secondary">{{ card_data["set_name"] }}</h6>
-                    <p class="card-text">Cost: ${{ card_data["price"] }}</p>
-                    <div class="container text-end">
-                        <div class="row justify-content-end gx-2 gy-2">
-                            <div class="col-12">
-                                <div data-mdb-input-init class="form-outline">
-                                    <span>Have</span>
-                                    <input type="number" class="input_sizing card_have_input_class"
-                                           data-extra-data="{{ card_data['tcgp_id'] }}" placeholder="0"
-                                           value="{{ card_data['state_have'] }}" onchange="update_have(event)">
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div data-mdb-input-init class="form-outline">
-                                    <span>Want</span>
-                                    <input type="number" class="input_sizing card_want_input_class"
-                                           data-extra-data="{{ card_data['tcgp_id'] }}" placeholder="0"
-                                           value="{{ card_data['state_want'] }}" onchange="update_want(event)">
-                                </div>
-                            </div>
-                            <div class="col-12">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <img id="card_image" class="img-fluid" loading="lazy"
+                 src="/static/card_images/{{ card_data['tcgp_id'] }}.jpg" onerror="apply_default_image(this)">
         </div>
-        <div class="card-footer">
-            <div class="d-grid gap-2 d-md-flex justify-content-between">
-                <a id="update_gift" href="" class="btn btn-primary"><i class="bi bi-gift"></i></a>
-                <button type="button" class="btn btn-primary btn-sm card_swap_input_class">Own</button>
-                <a id="store_link"
-                   href="https://www.tcgplayer.com/product/{{ card_data['tcgp_id'] }}/pokmeon-{{ card_data['tcgp_path'] }}"
-                   target="_blank" rel="noopener noreferrer" class="btn btn-primary">Store <i
-                        class="bi bi-shop"></i></a>
-            </div>
+        <div class="card-footer ">
+            <h6>
+                {% if card_data and 'own_count' in card_data and card_data['own_count'] %}
+                Have: {{ card_data['own_count'] }}
+                {% endif %}
+                <span style="float:right;"> {{ card_data["set_name"] }} </span>
+            </h6>
         </div>
     </div>
 </div>

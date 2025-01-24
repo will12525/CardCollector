@@ -80,7 +80,7 @@ async function swap_own(event) {
     console.log(event)
     let data = {
         "tcgp_id": event.target.dataset.extraData,
-        "state_have": parseInt(event.target.value, 10)
+        "own_count": parseInt(event.target.value, 10)
     };
 //    response_data = fetchAndSetData(url, data)
 }
@@ -88,7 +88,7 @@ async function update_have(event) {
     var url = "/update_have";
     let data = {
         "tcgp_id": event.target.dataset.extraData,
-        "state_have": parseInt(event.target.value, 10)
+        "own_count": parseInt(event.target.value, 10)
     };
     response_data = fetchAndSetData(url, data)
 }
@@ -161,7 +161,8 @@ async function generatePackButton(filter_str) {
         "filter_str": filter_str,
         "card_name_search_query": document.getElementById("card_name_search_query_text_field").value,
         "card_season_search_query": document.getElementById("card_season_search_query_text_field").value,
-        "filter_ownership": document.getElementById("filter_ownership").textContent
+        "filter_ownership": document.getElementById("filter_ownership").textContent,
+        "user_id": 1
     };
     generatePack(data)
 }
@@ -210,13 +211,13 @@ async function getSetCardList(set_name) {
 
 document.addEventListener("DOMContentLoaded", function(event){
     let data = {
-        "set_name": "",
+        "set_name": "Base Set (Shadowless)",
         "filter_str": document.getElementById("sort_by_selected_item").textContent,
         "card_name_search_query": "",
-        "filter_ownership": "want"
+        "filter_ownership": ""
     };
     console.log(data)
-//    queryDB(data)
+    queryDB(data)
 });
 
 

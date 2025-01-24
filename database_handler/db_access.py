@@ -6,6 +6,8 @@ import sqlite3
 from . import common_objects
 from .common_objects import DBType
 
+sql_insert_user_info_table = f"INSERT OR IGNORE INTO {common_objects.USER_INFO_TABLE} VALUES (null, :{common_objects.USER_NAME_COLUMN});"
+
 
 def print_db_traceback(error, message):
     # return
@@ -45,8 +47,10 @@ class DBConnection:
     connection = None
     db_type = None
 
-    def __init__(self, db_type=DBType.PHYSICAL):
+    def __init__(self, db_type=DBType.PHYSICAL, file_name=None):
         self.db_type = db_type
+        if file_name:
+            self.MEDIA_METADATA_DB_NAME = file_name
 
     def __enter__(self):
         try:
@@ -125,3 +129,6 @@ class DBConnection:
             )
             version = self.VERSION
         return version
+
+    def add_user(self, params):
+        return self.add_data_to_db(sql_insert_user_info_table, params)

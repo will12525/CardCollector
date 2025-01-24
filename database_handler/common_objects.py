@@ -1,42 +1,49 @@
 # Table names
 from enum import Enum, auto
 
-CARD_INFO_TABLE = "card_info"
-SET_INFO_TABLE = "set_info"
-
-SET_ID_COLUMN = "set_id"
-
 ID_COLUMN = "id"
-STATE_HAVE_COLUMN = "state_have"
-STATE_WANT_COLUMN = "state_want"
-STATE_GIFT_COLUMN = "state_gift"
+
+
+CARD_INFO_TABLE = "card_info"
 CARD_NAME_COLUMN = "card_name"
 CARD_TYPE_COLUMN = "card_type"
 CARD_TYPE2_COLUMN = "card_type2"
-SET_NAME_COLUMN = "set_name"
-SET_INDEX_COLUMN = "set_index"
-PRICE_COLUMN = "price"
 CARD_RARITY_COLUMN = "card_rarity"
 CARD_INDEX_COLUMN = "card_index"
 TCGP_ID_COLUMN = "tcgp_id"
 TCGP_PATH_COLUMN = "tcgp_path"
+SET_ID_COLUMN = "set_id"
+
+SET_INFO_TABLE = "set_info"
+SET_NAME_COLUMN = "set_name"
+SET_INDEX_COLUMN = "set_index"
+SET_CARD_COUNT_COLUMN = "set_card_count"
+
+USER_INFO_TABLE = "user_info"
+USER_NAME_COLUMN = "user_name"
+
+
+USER_COLLECTION_TABLE = "user_collection"
+USER_ID_COLUMN = "user_id"
+CARD_ID_COLUMN = "card_id"
+OWN_COUNT_COLUMN = "own_count"
+STATE_WANT_COLUMN = "state_want"
+STATE_GIFT_COLUMN = "state_gift"
+
+PRICE_COLUMN = "price"
+
 
 default_card_dict = {
-    STATE_HAVE_COLUMN: 0,
-    STATE_WANT_COLUMN: 0,
     CARD_NAME_COLUMN: "",
     SET_NAME_COLUMN: "",
     SET_ID_COLUMN: "",
     SET_INDEX_COLUMN: 0,
-    PRICE_COLUMN: 0.0,
+    CARD_TYPE_COLUMN: "",
     CARD_RARITY_COLUMN: "",
     CARD_INDEX_COLUMN: None,
-    STATE_GIFT_COLUMN: 0,
     TCGP_ID_COLUMN: 0,
     TCGP_PATH_COLUMN: "",
 }
-
-default_set_dict = {ID_COLUMN: None, SET_NAME_COLUMN: "", SET_INDEX_COLUMN: 0}
 
 
 class CardInfo:
@@ -184,8 +191,37 @@ def get_set_index(set_name):
     return None
 
 
+def get_set_name_from_index(set_index):
+    print(set_index)
+    if set_index < len(tcgp_set_info):
+        return tcgp_set_info[set_index - 1].get("name")
+    return None
+
+
 def get_set_card_count(set_name):
     for set_info in tcgp_set_info:
         if set_info.get("name", "") == set_name:
             return set_info.get("card_count", "")
     return None
+
+
+def get_set_count():
+    return len(tcgp_set_info)
+
+
+class TCGSet:
+    set_name = ""
+    set_index = None
+    set_card_count = None
+
+    def __init__(self, set_name):
+        self.set_name = set_name
+        self.set_index = get_set_index(set_name)
+        self.set_card_count = get_set_card_count(set_name)
+
+    def to_dict(self):
+        return {
+            "set_name": self.set_name,
+            "set_index": self.set_index,
+            "set_card_count": self.set_card_count,
+        }

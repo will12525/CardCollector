@@ -40,7 +40,7 @@
                     <h5 class="card-title" id="filter_ownership" hidden="hidden">want</h5>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1"
-                               value="option1" onchange="javascript:applyFilterOwnership('')">
+                               value="option1" checked onchange="javascript:applyFilterOwnership('')">
                         <label class="form-check-label" for="exampleRadios1">
                             All
                         </label>
@@ -50,13 +50,6 @@
                                value="option2" onchange="javascript:applyFilterOwnership('have')">
                         <label class="form-check-label" for="exampleRadios2">
                             Have
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3"
-                               value="option3" checked onchange="javascript:applyFilterOwnership('want')">
-                        <label class="form-check-label" for="exampleRadios3">
-                            Want
                         </label>
                     </div>
                 </div>
@@ -79,19 +72,15 @@
                                 Index Reverse</a></li>
                             <li><a class="dropdown-item" href="javascript:applySortFilter('A-Z')">A-Z</a></li>
                             <li><a class="dropdown-item" href="javascript:applySortFilter('Z-A')">Z-A</a></li>
-                            <li><a class="dropdown-item" href="javascript:applySortFilter('Price: Low - High')">Price:
-                                Low - High</a></li>
-                            <li><a class="dropdown-item" href="javascript:applySortFilter('Price: High - Low')">Price:
-                                High - Low</a></li>
                             <li><a class="dropdown-item" href="javascript:applySortFilter('Have')">Have</a></li>
-                            <li><a class="dropdown-item" href="javascript:applySortFilter('Want')">Want</a></li>
                         </ul>
                     </div>
                 </div>
                 <ul class="list-group list-group-flush">
                 </ul>
                 <div id="metadata_card_body" class="card-body">
-                    <h5 class="card-title" id="primary_card_set_title">{{ python_metadata.get('set_name', '') }}</h5>
+                    <h5 class="card-title" id="primary_card_set_title">{{ python_metadata.get('set_name',
+                        python_metadata['set_list'][0].get('set_name')) }}</h5>
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button"
                                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -99,8 +88,6 @@
                             Set list
                         </button>
                         <ul class="dropdown-menu" style="height:400px; overflow-y:auto;">
-                            <li><a class="dropdown-item"
-                                   href="javascript:getSetCardList('')">All</a></li>
                             {% for set_data in python_metadata['set_list']: %}
                             <li><a class="dropdown-item"
                                    href="javascript:getSetCardList('{{ set_data.get('set_name') }}')">{{
