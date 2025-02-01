@@ -9,6 +9,7 @@ from database_handler import common_objects
 from database_handler.common_objects import DBType
 from database_handler.db_getter import DatabaseHandler
 from database_handler.db_setter import DBCreator
+from pack_generator import Pack
 
 # from database_handler.input_file_parser import load_set_data_dir
 
@@ -128,12 +129,16 @@ def generate_pack():
     # {"card_count": 10, "set_name": json_request.get(common_objects.SET_NAME_COLUMN)}
 
     if json_request := request.get_json():
+        db_request = {"set_name": json_request.get("set_name"), "user_id": 1}
         print(f"generate_pack: {json_request}")
         with DatabaseHandler() as db_getter_connection:
+            set_card_list = db_getter_connection.get_all_set_card_data(db_request)
+            pack = Pack(set_card_list)
+            data["set_card_list"] = pack.open()
             # Generate the pack
-            data["set_card_list"] = db_getter_connection.generate_pack_from_set(
-                {"card_count": 10, "set_name": json_request.get("set_name")}
-            )
+            # data["set_card_list"] = db_getter_connection.generate_pack_from_set(
+            #     {"card_count": 10, "set_name": json_request.get("set_name")}
+            # )
             data["set_list"] = db_getter_connection.get_sets()
             # Update user collection with the new pack data
             for card in data["set_card_list"]:

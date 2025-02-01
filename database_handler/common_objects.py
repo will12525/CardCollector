@@ -71,51 +71,48 @@ class DBType(Enum):
     MEMORY = auto()
 
 
-card_rarity_rate = {
-    "common": 0.4,
-    "uncommon": 0.4,
-    "rare": 0.4,
-    "holo rare": 0.4,
+card_rarities = {
+    "Common": 0.4,
+    "Uncommon": 0.3,
+    "Rare": 0.01,
 }
-# generated_rarities = {
-#     "Common": 4155,
-#     "Uncommon": 3642,
-#     "Rare": 1937,
-#     "Rare Holo": 1401,
-#     "Rare Holo ex": 130,
-#     "Rare Holo LV.X": 32,
-#     "Prime": 21,
-#     "Ultra Rare": 157,
-#     "Double Rare": 81,
-#     "ACE SPEC Rare": 24,
-#     "Rare Radiant": 9,
-#     "Illustration Rare": 185,
-#     "Special Illustration Rare": 84,
-#     "Shiny": 7,
-#     "Shiny Full Art": 3,
-#     "Hyper Rare": 50,
-#     "Rare Secret": 258,
-#     "Rare Ultra": 131,
-#     "Full Art": 479,
-#     "Secret": 294,
-#     "Alternate Full Art": 59,
-#     "Secret Rare": 15,
-#     "Alternate Art Secret": 15,
-#     "holo": 831,
-#     "Rare Ace": 12,
-#     "Special": 2,
-#     "Delta Species": 137,
-#     "Rare Holo star": 2,
-#     "Shining Holo": 8,
-#     "SuperRare Holo": 7,
-#     "Ultra-Rare Rare": 2,
-#     "TGU": 21,
-#     "TGH": 45,
-#     "Rare Rainbow": 4,
-#     "Alpha": 10,
-#     "Omega": 10,
-# }
-
+rare_sub_types = {
+    "Rare": 0.01,
+    "Rare Holo": 0.01,
+    "Rare Holo LV.X": 0.01,
+    "Rare Holo ex": 0.01,
+    "Rare Holo star": 0.01,
+    "Rare Secret": 0.008,
+    "Rare Ultra": 0.008,
+    "Rare Ace": 0.01,
+    "Delta Species": 0.01,
+    "Prime": 0.01,
+    "Full Art": 0.005,
+    "Team Plasma": 0.01,
+    "Shining Holo": 0.01,
+    "SuperRare Holo": 0.005,
+    "Secret": 0.003,
+    "Alternate Full Art": 0.005,
+    "Secret Rare": 0.001,
+    "Double Rare": 0.01,
+    "Ultra Rare": 0.0001,
+    "Illustration Rare": 0.005,
+    "Special Illustration Rare": 0.001,
+    "Cosmos Holo": 0.01,
+    "Hyper Rare": 0.0001,
+    "ACE SPEC Rare": 0.01,
+    "Cracked Ice Holo": 0.01,
+    "Alternate Art Secret": 0.0001,
+    "Ultra-Rare Rare": 0.01,
+    "TGU": 0.01,
+    "TGH": 0.01,
+    "Shiny": 0.01,
+    "Rare Rainbow": 0.0001,
+    "Rare Radiant": 0.01,
+    "Shiny Full Art": 0.0001,
+    "Alpha": 0.01,
+    "Omega": 0.01,
+}
 
 tcgp_set_info = {
     "Base Set (Shadowless)": {"card_count": 102, "set_index": 1},
@@ -275,3 +272,10 @@ def get_set_card_count(set_name):
 
 def get_set_count():
     return len(tcgp_set_info)
+
+
+def get_total_card_count():
+    card_sum = 0
+    for set_info in tcgp_set_info.values():
+        card_sum += set_info.get("card_count")
+    return card_sum

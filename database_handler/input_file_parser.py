@@ -441,9 +441,10 @@ class CardData:
         # if "(" in self.card_name:
         #     print("Break")
         self.card_name = re.sub(r"[\[\]()]", "", self.card_name)
-        if "holo" in self.rarity.lower():
-            # input(self.rarity)
-            self.rarity = "holo"
+        self.rarity = self.rarity.replace("Holofoil", "").replace("Reverse", "").strip()
+        # if "holo" in self.rarity.lower():
+        #     # input(self.rarity)
+        #     self.rarity = "holo"
 
     def to_dict(self):
         card_dict = {
@@ -482,7 +483,9 @@ class SetDataList:
                 if not self.set_name:
                     self.populate_set_data(data_path, card_data.set_name)
 
-                if "Code Card - " in card_data.card_name or card_data.cost == 0:
+                if "Code Card - " in card_data.card_name:
+                    continue
+                if "1st Edition" in card_data.rarity or "Unlimited" in card_data.rarity:
                     continue
 
                 if card_data.tcgp_id in self.card_dict:

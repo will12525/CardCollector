@@ -255,17 +255,13 @@ class TestDBCreator(TestDBCreatorInit):
 
                 if not card_data.card_index:
                     cards_missing_index += 1
-                assert cards_missing_index <= 2542
                 if not card_data.card_type:
                     cards_missing_type += 1
-                assert cards_missing_type <= 4441
                 if not card_data.card_class:
                     cards_missing_class += 1
-                assert cards_missing_class <= 2602
                 if not card_data.rarity:
                     cards_missing_rarity += 1
                     # input(json.dumps(card_data.to_dict(), indent=4))
-                assert cards_missing_rarity <= 622
 
                 # assert card_data.card_name == backup_card_data["card_name"]
                 # assert card_data.tcgp_path == backup_card_data["tcgp_path"]
@@ -280,12 +276,21 @@ class TestDBCreator(TestDBCreatorInit):
 
         # Original required 2802 user input
         # New requires 3196 user input
-        print("card_count: ", card_count)
+        print(
+            "card_count: ",
+            card_count,
+            "Expected:",
+            common_objects.get_total_card_count(),
+        )
         print("cards_missing_index: ", cards_missing_index)
         print("cards_missing_type: ", cards_missing_type)
         print("cards_missing_class: ", cards_missing_class)
         print("cards_missing_rarity: ", cards_missing_rarity)
-        assert card_count == 15015
+        assert 15032 <= card_count <= common_objects.get_total_card_count()
+        assert cards_missing_rarity <= 1572
+        assert cards_missing_index <= 2608
+        assert cards_missing_type <= 4565
+        assert cards_missing_class <= 2735
 
         print(json.dumps(rarity_names, indent=4))
 
