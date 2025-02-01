@@ -132,7 +132,7 @@ def generate_pack():
         with DatabaseHandler() as db_getter_connection:
             # Generate the pack
             data["set_card_list"] = db_getter_connection.generate_pack_from_set(
-                {"card_count": 10, "set_name": "Base Set (Shadowless)"}
+                {"card_count": 10, "set_name": json_request.get("set_name")}
             )
             data["set_list"] = db_getter_connection.get_sets()
             # Update user collection with the new pack data

@@ -15,8 +15,7 @@ from image_downloader import download_image
 from database_handler.input_file_parser import (
     # load_set_data_dir,
     # load_set_data,
-    get_pedia_set_data,
-    get_all_cards_matching_name,
+    load_set_list_from_name,
 )
 
 
@@ -26,8 +25,8 @@ from database_handler.input_file_parser import (
 
 class TestDBGetterBase(TestCase):
     DB_PATH = "pokemon_card_data.db"
-    # DATA_PATH = "../data_files/set_htmls/"
-    SET_LIST_PATH = "../data_files/set_list_htmls/"
+    # DATA_PATH = "../data_files/"
+    SET_LIST_PATH = "../data_files/"
 
     def setUp(self) -> None:
         self.reset_db()
@@ -262,7 +261,10 @@ class TestIconCollector(TestDBGetterBase):
         with DatabaseHandler(common_objects.DBType.PHYSICAL) as db_getter_connection:
             db_getter_connection.add_user({common_objects.USER_NAME_COLUMN: "Willow"})
             for card in db_getter_connection.get_all_set_card_data(
-                {common_objects.SET_NAME_COLUMN: set_name}
+                {
+                    common_objects.SET_NAME_COLUMN: set_name,
+                    common_objects.USER_ID_COLUMN: user_id,
+                }
             ):
                 db_getter_connection.set_have(
                     {
@@ -482,9 +484,7 @@ class TestIconCollector(TestDBGetterBase):
             set_list = db_getter_connection.get_sets()
             for set_item in set_list:
                 set_name = set_item.get(common_objects.SET_NAME_COLUMN)
-                set_card_list = get_pedia_set_data(
-                    f"{self.SET_LIST_PATH}{set_name}.html"
-                )
+                set_card_list = load_set_list_from_name(self.SET_LIST_PATH, set_name)
                 print(set_name, json.dumps(set_card_list, indent=4))
                 for card in db_getter_connection.query_collection(
                     set_name, "Sets", "", "", "", None
@@ -497,8 +497,8 @@ class TestIconCollector(TestDBGetterBase):
                             + "/pokmeon-"
                             + card["tcgp_path"]
                         )
-                        found_card_matches = get_all_cards_matching_name(
-                            card.get(common_objects.CARD_NAME_COLUMN), set_card_list
+                        found_card_matches = set_card_list.get_all_cards_matching_name(
+                            card.get(common_objects.CARD_NAME_COLUMN)
                         )
                         filtered_card_matches = []
                         for card_match in found_card_matches:

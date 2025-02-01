@@ -32,10 +32,11 @@ sql_create_card_info_table = f"""{CREATE_TABLE} {common_objects.CARD_INFO_TABLE}
                                     {common_objects.CARD_INDEX_COLUMN} integer,
                                     {common_objects.TCGP_ID_COLUMN} integer NOT NULL UNIQUE,
                                     {common_objects.TCGP_PATH_COLUMN} text NOT NULL,
+                                    {common_objects.CARD_CLASS_COLUMN} text NOT NULL,
                                     FOREIGN KEY ({common_objects.SET_ID_COLUMN}) REFERENCES {common_objects.SET_INFO_TABLE} ({common_objects.ID_COLUMN})
                                 );"""
 
-sql_insert_card_info_table = f"INSERT INTO {common_objects.CARD_INFO_TABLE} VALUES(null, :{common_objects.CARD_NAME_COLUMN}, :{common_objects.SET_ID_COLUMN}, :{common_objects.CARD_TYPE_COLUMN}, :{common_objects.CARD_RARITY_COLUMN}, :{common_objects.CARD_INDEX_COLUMN}, :{common_objects.TCGP_ID_COLUMN}, :{common_objects.TCGP_PATH_COLUMN});"
+sql_insert_card_info_table = f"INSERT INTO {common_objects.CARD_INFO_TABLE} VALUES(null, :{common_objects.CARD_NAME_COLUMN}, :{common_objects.SET_ID_COLUMN}, :{common_objects.CARD_TYPE_COLUMN}, :{common_objects.CARD_RARITY_COLUMN}, :{common_objects.CARD_INDEX_COLUMN}, :{common_objects.TCGP_ID_COLUMN}, :{common_objects.TCGP_PATH_COLUMN}, :{common_objects.CARD_CLASS_COLUMN});"
 
 sql_create_set_info_table = f"""{CREATE_TABLE} {common_objects.SET_INFO_TABLE} (
                                     {common_objects.ID_COLUMN} integer PRIMARY KEY AUTOINCREMENT,
@@ -87,18 +88,11 @@ class DBCreator(DBConnection):
         return self.add_data_to_db(sql_insert_card_info_table, card_data)
 
     def add_set_card_data(self, set_data):
-        set_id = None
-        for card in set_data.values():
-            if not set_id:
-                card[common_objects.SET_ID_COLUMN] = self.set_set_data(card)
-                if not card[common_objects.SET_ID_COLUMN]:
-                    card[common_objects.SET_ID_COLUMN] = self.get_set_id_from_name(
-                        card.get(common_objects.SET_NAME_COLUMN)
-                    )
-                set_id = card[common_objects.SET_ID_COLUMN]
-            else:
-                card[common_objects.SET_ID_COLUMN] = set_id
-            self.set_card_metadata(card)
+        set_data.set_id = self.set_set_data(set_data.to_dict())
+
+        for card in set_data.card_dict.values():
+            card.set_id = set_data.set_id
+            self.set_card_metadata(card.to_dict())
 
     def insert_card(self, card):
         card[common_objects.SET_ID_COLUMN] = self.get_set_id_from_name(

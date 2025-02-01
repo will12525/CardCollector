@@ -3,7 +3,6 @@ from unittest import TestCase
 from bs4 import BeautifulSoup as bs
 import re
 from database_handler import input_file_parser, common_objects
-from deck import read_file
 
 aquapolis_compare = [
     ("Aipom", "aquapolis-aipom"),
@@ -200,1001 +199,1308 @@ aquapolis_set_list_compare = [
         "card_type": "Lightning",
         "card_rarity": "Rare Holo",
         "card_index": 1,
+        "card_class": "",
     },
     {
         "card_name": "Arcanine",
         "card_type": "Fire",
         "card_rarity": "Rare Holo",
         "card_index": 2,
+        "card_class": "",
     },
     {
         "card_name": "Ariados",
         "card_type": "Grass",
         "card_rarity": "Rare Holo",
         "card_index": 3,
+        "card_class": "",
     },
     {
         "card_name": "Azumarill",
         "card_type": "Water",
         "card_rarity": "Rare Holo",
         "card_index": 4,
+        "card_class": "",
     },
     {
         "card_name": "Bellossom",
         "card_type": "Grass",
         "card_rarity": "Rare Holo",
         "card_index": 5,
+        "card_class": "",
     },
     {
         "card_name": "Blissey",
         "card_type": "Colorless",
         "card_rarity": "Rare Holo",
         "card_index": 6,
+        "card_class": "",
     },
     {
         "card_name": "Electrode",
         "card_type": "Lightning",
         "card_rarity": "Rare Holo",
         "card_index": 7,
+        "card_class": "",
     },
     {
         "card_name": "Entei",
         "card_type": "Fire",
         "card_rarity": "Rare Holo",
         "card_index": 8,
+        "card_class": "",
     },
     {
         "card_name": "Espeon",
         "card_type": "Psychic",
         "card_rarity": "Rare Holo",
         "card_index": 9,
+        "card_class": "",
     },
     {
         "card_name": "Exeggutor",
         "card_type": "Grass",
         "card_rarity": "Rare Holo",
         "card_index": 10,
+        "card_class": "",
     },
     {
         "card_name": "Houndoom",
         "card_type": "Darkness",
         "card_rarity": "Rare Holo",
         "card_index": 11,
+        "card_class": "",
     },
     {
         "card_name": "Hypno",
         "card_type": "Psychic",
         "card_rarity": "Rare Holo",
         "card_index": 12,
+        "card_class": "",
     },
     {
         "card_name": "Jumpluff",
         "card_type": "Grass",
         "card_rarity": "Rare Holo",
         "card_index": 13,
+        "card_class": "",
     },
     {
         "card_name": "Kingdra",
         "card_type": "Water",
         "card_rarity": "Rare Holo",
         "card_index": 14,
+        "card_class": "",
     },
     {
         "card_name": "Lanturn",
         "card_type": "Lightning",
         "card_rarity": "Rare Holo",
         "card_index": 15,
+        "card_class": "",
     },
     {
         "card_name": "Magneton",
         "card_type": "Metal",
         "card_rarity": "Rare Holo",
         "card_index": 16,
+        "card_class": "",
     },
     {
         "card_name": "Muk",
         "card_type": "Grass",
         "card_rarity": "Rare Holo",
         "card_index": 17,
+        "card_class": "",
     },
     {
         "card_name": "Nidoking",
         "card_type": "Fighting",
         "card_rarity": "Rare Holo",
         "card_index": 18,
+        "card_class": "",
     },
     {
         "card_name": "Ninetales",
         "card_type": "Fire",
         "card_rarity": "Rare Holo",
         "card_index": 19,
+        "card_class": "",
     },
     {
         "card_name": "Octillery",
         "card_type": "Water",
         "card_rarity": "Rare Holo",
         "card_index": 20,
+        "card_class": "",
     },
     {
         "card_name": "Scizor",
         "card_type": "Metal",
         "card_rarity": "Rare Holo",
         "card_index": 21,
+        "card_class": "",
     },
     {
         "card_name": "Slowking",
         "card_type": "Psychic",
         "card_rarity": "Rare Holo",
         "card_index": 22,
+        "card_class": "",
     },
     {
         "card_name": "Steelix",
         "card_type": "Metal",
         "card_rarity": "Rare Holo",
         "card_index": 23,
+        "card_class": "",
     },
     {
         "card_name": "Sudowoodo",
         "card_type": "Fighting",
         "card_rarity": "Rare Holo",
         "card_index": 24,
+        "card_class": "",
     },
     {
         "card_name": "Suicune",
         "card_type": "Water",
         "card_rarity": "Rare Holo",
         "card_index": 25,
+        "card_class": "",
     },
     {
         "card_name": "Tentacruel",
         "card_type": "Water",
         "card_rarity": "Rare Holo",
         "card_index": 26,
+        "card_class": "",
     },
     {
         "card_name": "Togetic",
         "card_type": "Colorless",
         "card_rarity": "Rare Holo",
         "card_index": 27,
+        "card_class": "",
     },
     {
         "card_name": "Tyranitar",
         "card_type": "Darkness",
         "card_rarity": "Rare Holo",
         "card_index": 28,
+        "card_class": "",
     },
     {
         "card_name": "Umbreon",
         "card_type": "Darkness",
         "card_rarity": "Rare Holo",
         "card_index": 29,
+        "card_class": "",
     },
     {
         "card_name": "Victreebel",
         "card_type": "Grass",
         "card_rarity": "Rare Holo",
         "card_index": 30,
+        "card_class": "",
     },
     {
         "card_name": "Vileplume",
         "card_type": "Grass",
         "card_rarity": "Rare Holo",
         "card_index": 31,
+        "card_class": "",
     },
     {
         "card_name": "Zapdos",
         "card_type": "Lightning",
         "card_rarity": "Rare Holo",
         "card_index": 32,
+        "card_class": "",
     },
     {
         "card_name": "Ampharos",
         "card_type": "Lightning",
         "card_rarity": "Rare",
         "card_index": 1,
+        "card_class": "",
     },
     {
         "card_name": "Arcanine",
         "card_type": "Fire",
         "card_rarity": "Rare",
         "card_index": 2,
+        "card_class": "",
     },
     {
         "card_name": "Ariados",
         "card_type": "Grass",
         "card_rarity": "Rare",
         "card_index": 3,
+        "card_class": "",
     },
     {
         "card_name": "Azumarill",
         "card_type": "Water",
         "card_rarity": "Rare",
         "card_index": 4,
+        "card_class": "",
     },
     {
         "card_name": "Bellossom",
         "card_type": "Grass",
         "card_rarity": "Rare",
         "card_index": 5,
+        "card_class": "",
     },
     {
         "card_name": "Blissey",
         "card_type": "Colorless",
         "card_rarity": "Rare",
         "card_index": 6,
+        "card_class": "",
     },
     {
         "card_name": "Donphan",
         "card_type": "Fighting",
         "card_rarity": "Rare",
         "card_index": 7,
+        "card_class": "",
     },
     {
         "card_name": "Electrode",
         "card_type": "Lightning",
         "card_rarity": "Rare",
         "card_index": 8,
+        "card_class": "",
     },
     {
         "card_name": "Elekid",
         "card_type": "Lightning",
         "card_rarity": "Rare",
         "card_index": 9,
+        "card_class": "",
     },
     {
         "card_name": "Entei",
         "card_type": "Fire",
         "card_rarity": "Rare",
         "card_index": 10,
+        "card_class": "",
     },
     {
         "card_name": "Espeon",
         "card_type": "Psychic",
         "card_rarity": "Rare",
         "card_index": 11,
+        "card_class": "",
     },
     {
         "card_name": "Exeggutor",
         "card_type": "Grass",
         "card_rarity": "Rare",
         "card_index": 12,
+        "card_class": "",
     },
     {
         "card_name": "Exeggutor",
         "card_type": "Psychic",
         "card_rarity": "Rare",
         "card_index": 13,
+        "card_class": "",
     },
     {
         "card_name": "Houndoom",
         "card_type": "Fire",
         "card_rarity": "Rare",
         "card_index": 14,
+        "card_class": "",
     },
     {
         "card_name": "Houndoom",
         "card_type": "Darkness",
         "card_rarity": "Rare",
         "card_index": 15,
+        "card_class": "",
     },
     {
         "card_name": "Hypno",
         "card_type": "Psychic",
         "card_rarity": "Rare",
         "card_index": 16,
+        "card_class": "",
     },
     {
         "card_name": "Jumpluff",
         "card_type": "Grass",
         "card_rarity": "Rare",
         "card_index": 17,
+        "card_class": "",
     },
     {
         "card_name": "Jynx",
         "card_type": "Psychic",
         "card_rarity": "Rare",
         "card_index": 18,
+        "card_class": "",
     },
     {
         "card_name": "Kingdra",
         "card_type": "Water",
         "card_rarity": "Rare",
         "card_index": 19,
+        "card_class": "",
     },
     {
         "card_name": "Lanturn",
         "card_type": "Water",
         "card_rarity": "Rare",
         "card_index": 20,
+        "card_class": "",
     },
     {
         "card_name": "Lanturn",
         "card_type": "Lightning",
         "card_rarity": "Rare",
         "card_index": 21,
+        "card_class": "",
     },
     {
         "card_name": "Magneton",
         "card_type": "Metal",
         "card_rarity": "Rare",
         "card_index": 22,
+        "card_class": "",
     },
-    {"card_name": "Muk", "card_type": "Grass", "card_rarity": "Rare", "card_index": 23},
+    {
+        "card_name": "Muk",
+        "card_type": "Grass",
+        "card_rarity": "Rare",
+        "card_index": 23,
+        "card_class": "",
+    },
     {
         "card_name": "Nidoking",
         "card_type": "Fighting",
         "card_rarity": "Rare",
         "card_index": 24,
+        "card_class": "",
     },
     {
         "card_name": "Ninetales",
         "card_type": "Fire",
         "card_rarity": "Rare",
         "card_index": 25,
+        "card_class": "",
     },
     {
         "card_name": "Octillery",
         "card_type": "Water",
         "card_rarity": "Rare",
         "card_index": 26,
+        "card_class": "",
     },
     {
         "card_name": "Parasect",
         "card_type": "Grass",
         "card_rarity": "Rare",
         "card_index": 27,
+        "card_class": "",
     },
     {
         "card_name": "Porygon2",
         "card_type": "Colorless",
         "card_rarity": "Rare",
         "card_index": 28,
+        "card_class": "",
     },
     {
         "card_name": "Primeape",
         "card_type": "Fighting",
         "card_rarity": "Rare",
         "card_index": 29,
+        "card_class": "",
     },
     {
         "card_name": "Quagsire",
         "card_type": "Water",
         "card_rarity": "Rare",
         "card_index": 30,
+        "card_class": "",
     },
     {
         "card_name": "Rapidash",
         "card_type": "Fire",
         "card_rarity": "Rare",
         "card_index": 31,
+        "card_class": "",
     },
     {
         "card_name": "Scizor",
         "card_type": "Metal",
         "card_rarity": "Rare",
         "card_index": 32,
+        "card_class": "",
     },
     {
         "card_name": "Slowbro",
         "card_type": "Water",
         "card_rarity": "Rare",
         "card_index": 33,
+        "card_class": "",
     },
     {
         "card_name": "Slowking",
         "card_type": "Psychic",
         "card_rarity": "Rare",
         "card_index": 34,
+        "card_class": "",
     },
     {
         "card_name": "Steelix",
         "card_type": "Metal",
         "card_rarity": "Rare",
         "card_index": 35,
+        "card_class": "",
     },
     {
         "card_name": "Sudowoodo",
         "card_type": "Fighting",
         "card_rarity": "Rare",
         "card_index": 36,
+        "card_class": "",
     },
     {
         "card_name": "Suicune",
         "card_type": "Water",
         "card_rarity": "Rare",
         "card_index": 37,
+        "card_class": "",
     },
     {
         "card_name": "Tentacruel",
         "card_type": "Water",
         "card_rarity": "Rare",
         "card_index": 38,
+        "card_class": "",
     },
     {
         "card_name": "Togetic",
         "card_type": "Colorless",
         "card_rarity": "Rare",
         "card_index": 39,
+        "card_class": "",
     },
     {
         "card_name": "Tyranitar",
         "card_type": "Darkness",
         "card_rarity": "Rare",
         "card_index": 40,
+        "card_class": "",
     },
     {
         "card_name": "Umbreon",
         "card_type": "Darkness",
         "card_rarity": "Rare",
         "card_index": 41,
+        "card_class": "",
     },
     {
         "card_name": "Victreebel",
         "card_type": "Grass",
         "card_rarity": "Rare",
         "card_index": 42,
+        "card_class": "",
     },
     {
         "card_name": "Vileplume",
         "card_type": "Grass",
         "card_rarity": "Rare",
         "card_index": 43,
+        "card_class": "",
     },
     {
         "card_name": "Zapdos",
         "card_type": "Lightning",
         "card_rarity": "Rare",
         "card_index": 44,
+        "card_class": "",
     },
     {
         "card_name": "Bellsprout",
         "card_type": "Grass",
         "card_rarity": "Uncommon",
         "card_index": 45,
+        "card_class": "",
     },
     {
         "card_name": "Dodrio",
         "card_type": "Colorless",
         "card_rarity": "Uncommon",
         "card_index": 46,
+        "card_class": "",
     },
     {
         "card_name": "Flaaffy",
         "card_type": "Lightning",
         "card_rarity": "Uncommon",
         "card_index": 47,
+        "card_class": "",
     },
     {
         "card_name": "Furret",
         "card_type": "Colorless",
         "card_rarity": "Uncommon",
         "card_index": 48,
+        "card_class": "",
     },
     {
         "card_name": "Gloom",
         "card_type": "Grass",
         "card_rarity": "Uncommon",
         "card_index": 49,
+        "card_class": "",
     },
     {
         "card_name": "Golduck",
         "card_type": "Water",
         "card_rarity": "Uncommon",
         "card_index": 50,
+        "card_class": "",
     },
     {
         "card_name": "Golduck",
         "card_type": "Water",
         "card_rarity": "Uncommon",
         "card_index": 50,
+        "card_class": "",
     },
     {
         "card_name": "Growlithe",
         "card_type": "Fire",
         "card_rarity": "Uncommon",
         "card_index": 51,
+        "card_class": "",
     },
     {
         "card_name": "Magnemite",
         "card_type": "Metal",
         "card_rarity": "Uncommon",
         "card_index": 52,
+        "card_class": "",
     },
     {
         "card_name": "Marill",
         "card_type": "Water",
         "card_rarity": "Uncommon",
         "card_index": 53,
+        "card_class": "",
     },
     {
         "card_name": "Marowak",
         "card_type": "Fighting",
         "card_rarity": "Uncommon",
         "card_index": 54,
+        "card_class": "",
     },
     {
         "card_name": "Nidorino",
         "card_type": "Grass",
         "card_rarity": "Uncommon",
         "card_index": 55,
+        "card_class": "",
     },
     {
         "card_name": "Pupitar",
         "card_type": "Fighting",
         "card_rarity": "Uncommon",
         "card_index": 56,
+        "card_class": "",
     },
     {
         "card_name": "Scyther",
         "card_type": "Grass",
         "card_rarity": "Uncommon",
         "card_index": 57,
+        "card_class": "",
     },
     {
         "card_name": "Seadra",
         "card_type": "Water",
         "card_rarity": "Uncommon",
         "card_index": 58,
+        "card_class": "",
     },
     {
         "card_name": "Seaking",
         "card_type": "Water",
         "card_rarity": "Uncommon",
         "card_index": 59,
+        "card_class": "",
     },
     {
         "card_name": "Skiploom",
         "card_type": "Grass",
         "card_rarity": "Uncommon",
         "card_index": 60,
+        "card_class": "",
     },
     {
         "card_name": "Smoochum",
         "card_type": "Psychic",
         "card_rarity": "Uncommon",
         "card_index": 61,
+        "card_class": "",
     },
     {
         "card_name": "Spinarak",
         "card_type": "Grass",
         "card_rarity": "Uncommon",
         "card_index": 62,
+        "card_class": "",
     },
     {
         "card_name": "Tyrogue",
         "card_type": "Fighting",
         "card_rarity": "Uncommon",
         "card_index": 63,
+        "card_class": "",
     },
     {
         "card_name": "Voltorb",
         "card_type": "Lightning",
         "card_rarity": "Uncommon",
         "card_index": 64,
+        "card_class": "",
     },
     {
         "card_name": "Weepinbell",
         "card_type": "Grass",
         "card_rarity": "Uncommon",
         "card_index": 65,
+        "card_class": "",
     },
     {
         "card_name": "Wooper",
         "card_type": "Water",
         "card_rarity": "Uncommon",
         "card_index": 66,
+        "card_class": "",
     },
     {
         "card_name": "Aipom",
         "card_type": "Colorless",
         "card_rarity": "Common",
         "card_index": 67,
+        "card_class": "",
     },
     {
         "card_name": "Bellsprout",
         "card_type": "Grass",
         "card_rarity": "Common",
         "card_index": 68,
+        "card_class": "",
     },
     {
         "card_name": "Chansey",
         "card_type": "Colorless",
         "card_rarity": "Common",
         "card_index": 69,
+        "card_class": "",
     },
     {
         "card_name": "Chinchou",
         "card_type": "Water",
         "card_rarity": "Common",
         "card_index": 70,
+        "card_class": "",
     },
     {
         "card_name": "Chinchou",
         "card_type": "Lightning",
         "card_rarity": "Common",
         "card_index": 71,
+        "card_class": "",
     },
     {
         "card_name": "Cubone",
         "card_type": "Fighting",
         "card_rarity": "Common",
         "card_index": 72,
+        "card_class": "",
     },
     {
         "card_name": "Doduo",
         "card_type": "Colorless",
         "card_rarity": "Common",
         "card_index": 73,
+        "card_class": "",
     },
     {
         "card_name": "Drowzee",
         "card_type": "Psychic",
         "card_rarity": "Common",
         "card_index": 74,
+        "card_class": "",
     },
     {
         "card_name": "Drowzee",
         "card_type": "Psychic",
         "card_rarity": "Common",
         "card_index": 74,
+        "card_class": "",
     },
     {
         "card_name": "Eevee",
         "card_type": "Colorless",
         "card_rarity": "Common",
         "card_index": 75,
+        "card_class": "",
     },
     {
         "card_name": "Exeggcute",
         "card_type": "Grass",
         "card_rarity": "Common",
         "card_index": 76,
+        "card_class": "",
     },
     {
         "card_name": "Exeggcute",
         "card_type": "Psychic",
         "card_rarity": "Common",
         "card_index": 77,
+        "card_class": "",
     },
     {
         "card_name": "Goldeen",
         "card_type": "Water",
         "card_rarity": "Common",
         "card_index": 78,
+        "card_class": "",
     },
     {
         "card_name": "Grimer",
         "card_type": "Grass",
         "card_rarity": "Common",
         "card_index": 79,
+        "card_class": "",
     },
     {
         "card_name": "Growlithe",
         "card_type": "Fire",
         "card_rarity": "Common",
         "card_index": 80,
+        "card_class": "",
     },
     {
         "card_name": "Hitmonchan",
         "card_type": "Fighting",
         "card_rarity": "Common",
         "card_index": 81,
+        "card_class": "",
     },
     {
         "card_name": "Hitmontop",
         "card_type": "Fighting",
         "card_rarity": "Common",
         "card_index": 82,
+        "card_class": "",
     },
     {
         "card_name": "Hoppip",
         "card_type": "Grass",
         "card_rarity": "Common",
         "card_index": 83,
+        "card_class": "",
     },
     {
         "card_name": "Horsea",
         "card_type": "Water",
         "card_rarity": "Common",
         "card_index": 84,
+        "card_class": "",
     },
     {
         "card_name": "Horsea",
         "card_type": "Water",
         "card_rarity": "Common",
         "card_index": 85,
+        "card_class": "",
     },
     {
         "card_name": "Houndour",
         "card_type": "Fire",
         "card_rarity": "Common",
         "card_index": 86,
+        "card_class": "",
     },
     {
         "card_name": "Houndour",
         "card_type": "Darkness",
         "card_rarity": "Common",
         "card_index": 87,
+        "card_class": "",
     },
     {
         "card_name": "Kangaskhan",
         "card_type": "Colorless",
         "card_rarity": "Common",
         "card_index": 88,
+        "card_class": "",
     },
     {
         "card_name": "Larvitar",
         "card_type": "Fighting",
         "card_rarity": "Common",
         "card_index": 89,
+        "card_class": "",
     },
     {
         "card_name": "Lickitung",
         "card_type": "Colorless",
         "card_rarity": "Common",
         "card_index": 90,
+        "card_class": "",
     },
     {
         "card_name": "Magnemite",
         "card_type": "Lightning",
         "card_rarity": "Common",
         "card_index": 91,
+        "card_class": "",
     },
     {
         "card_name": "Mankey",
         "card_type": "Fighting",
         "card_rarity": "Common",
         "card_index": 92,
+        "card_class": "",
     },
     {
         "card_name": "Mareep",
         "card_type": "Lightning",
         "card_rarity": "Common",
         "card_index": 93,
+        "card_class": "",
     },
     {
         "card_name": "Miltank",
         "card_type": "Colorless",
         "card_rarity": "Common",
         "card_index": 94,
+        "card_class": "",
     },
     {
         "card_name": "Mr. Mime",
         "card_type": "Psychic",
         "card_rarity": "Common",
         "card_index": 95,
+        "card_class": "",
     },
     {
         "card_name": "Mr. Mime",
         "card_type": "Psychic",
         "card_rarity": "Common",
         "card_index": 95,
+        "card_class": "",
     },
     {
         "card_name": "Nidoran M",
         "card_type": "Grass",
         "card_rarity": "Common",
         "card_index": 96,
+        "card_class": "",
     },
     {
         "card_name": "Oddish",
         "card_type": "Grass",
         "card_rarity": "Common",
         "card_index": 97,
+        "card_class": "",
     },
     {
         "card_name": "Onix",
         "card_type": "Fighting",
         "card_rarity": "Common",
         "card_index": 98,
+        "card_class": "",
     },
     {
         "card_name": "Paras",
         "card_type": "Grass",
         "card_rarity": "Common",
         "card_index": 99,
+        "card_class": "",
     },
     {
         "card_name": "Phanpy",
         "card_type": "Fighting",
         "card_rarity": "Common",
         "card_index": 100,
+        "card_class": "",
     },
     {
         "card_name": "Pinsir",
         "card_type": "Grass",
         "card_rarity": "Common",
         "card_index": 101,
+        "card_class": "",
     },
     {
         "card_name": "Ponyta",
         "card_type": "Fire",
         "card_rarity": "Common",
         "card_index": 102,
+        "card_class": "",
     },
     {
         "card_name": "Porygon",
         "card_type": "Colorless",
         "card_rarity": "Common",
         "card_index": 103,
+        "card_class": "",
     },
     {
         "card_name": "Porygon",
         "card_type": "Colorless",
         "card_rarity": "Common",
         "card_index": 103,
+        "card_class": "",
     },
     {
         "card_name": "Psyduck",
         "card_type": "Water",
         "card_rarity": "Common",
         "card_index": 104,
+        "card_class": "",
     },
     {
         "card_name": "Remoraid",
         "card_type": "Water",
         "card_rarity": "Common",
         "card_index": 105,
+        "card_class": "",
     },
     {
         "card_name": "Scyther",
         "card_type": "Grass",
         "card_rarity": "Common",
         "card_index": 106,
+        "card_class": "",
     },
     {
         "card_name": "Sentret",
         "card_type": "Colorless",
         "card_rarity": "Common",
         "card_index": 107,
+        "card_class": "",
     },
     {
         "card_name": "Slowpoke",
         "card_type": "Water",
         "card_rarity": "Common",
         "card_index": 108,
+        "card_class": "",
     },
     {
         "card_name": "Smeargle",
         "card_type": "Colorless",
         "card_rarity": "Common",
         "card_index": 109,
+        "card_class": "",
     },
     {
         "card_name": "Sneasel",
         "card_type": "Darkness",
         "card_rarity": "Common",
         "card_index": 110,
+        "card_class": "",
     },
     {
         "card_name": "Spinarak",
         "card_type": "Grass",
         "card_rarity": "Common",
         "card_index": 111,
+        "card_class": "",
     },
     {
         "card_name": "Tangela",
         "card_type": "Grass",
         "card_rarity": "Common",
         "card_index": 112,
+        "card_class": "",
     },
     {
         "card_name": "Tentacool",
         "card_type": "Water",
         "card_rarity": "Common",
         "card_index": 113,
+        "card_class": "",
     },
     {
         "card_name": "Togepi",
         "card_type": "Colorless",
         "card_rarity": "Common",
         "card_index": 114,
+        "card_class": "",
     },
     {
         "card_name": "Voltorb",
         "card_type": "Lightning",
         "card_rarity": "Common",
         "card_index": 115,
+        "card_class": "",
     },
     {
         "card_name": "Vulpix",
         "card_type": "Fire",
         "card_rarity": "Common",
         "card_index": 116,
+        "card_class": "",
     },
     {
         "card_name": "Wooper",
         "card_type": "Water",
         "card_rarity": "Common",
         "card_index": 117,
+        "card_class": "",
     },
-    {"card_name": "Apricorn Forest", "card_rarity": "Rare", "card_index": 118},
-    {"card_name": "Darkness Cube 01", "card_rarity": "Uncommon", "card_index": 119},
-    {"card_name": "Energy Switch", "card_rarity": "Uncommon", "card_index": 120},
-    {"card_name": "Fighting Cube 01", "card_rarity": "Uncommon", "card_index": 121},
-    {"card_name": "Fire Cube 01", "card_rarity": "Uncommon", "card_index": 122},
-    {"card_name": "Forest Guardian", "card_rarity": "Uncommon", "card_index": 123},
-    {"card_name": "Grass Cube 01", "card_rarity": "Uncommon", "card_index": 124},
-    {"card_name": "Healing Berry", "card_rarity": "Uncommon", "card_index": 125},
-    {"card_name": "Juggler", "card_rarity": "Uncommon", "card_index": 126},
-    {"card_name": "Lightning Cube 01", "card_rarity": "Uncommon", "card_index": 127},
-    {"card_name": "Memory Berry", "card_rarity": "Uncommon", "card_index": 128},
-    {"card_name": "Metal Cube 01", "card_rarity": "Uncommon", "card_index": 129},
-    {"card_name": "Pokemon Fan Club", "card_rarity": "Uncommon", "card_index": 130},
-    {"card_name": "Pokemon Park", "card_rarity": "Uncommon", "card_index": 131},
-    {"card_name": "Psychic Cube 01", "card_rarity": "Uncommon", "card_index": 132},
-    {"card_name": "Seer", "card_rarity": "Uncommon", "card_index": 133},
+    {
+        "card_name": "Apricorn Forest",
+        "card_type": "Stadium",
+        "card_rarity": "Rare",
+        "card_index": 118,
+        "card_class": "",
+    },
+    {
+        "card_name": "Darkness Cube 01",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 119,
+        "card_class": "",
+    },
+    {
+        "card_name": "Energy Switch",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 120,
+        "card_class": "",
+    },
+    {
+        "card_name": "Fighting Cube 01",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 121,
+        "card_class": "",
+    },
+    {
+        "card_name": "Fire Cube 01",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 122,
+        "card_class": "",
+    },
+    {
+        "card_name": "Forest Guardian",
+        "card_type": "Support",
+        "card_rarity": "Uncommon",
+        "card_index": 123,
+        "card_class": "",
+    },
+    {
+        "card_name": "Grass Cube 01",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 124,
+        "card_class": "",
+    },
+    {
+        "card_name": "Healing Berry",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 125,
+        "card_class": "",
+    },
+    {
+        "card_name": "Juggler",
+        "card_type": "Support",
+        "card_rarity": "Uncommon",
+        "card_index": 126,
+        "card_class": "",
+    },
+    {
+        "card_name": "Lightning Cube 01",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 127,
+        "card_class": "",
+    },
+    {
+        "card_name": "Memory Berry",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 128,
+        "card_class": "",
+    },
+    {
+        "card_name": "Metal Cube 01",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 129,
+        "card_class": "",
+    },
+    {
+        "card_name": "Pokemon Fan Club",
+        "card_type": "Support",
+        "card_rarity": "Uncommon",
+        "card_index": 130,
+        "card_class": "",
+    },
+    {
+        "card_name": "Pokemon Park",
+        "card_type": "Stadium",
+        "card_rarity": "Uncommon",
+        "card_index": 131,
+        "card_class": "",
+    },
+    {
+        "card_name": "Psychic Cube 01",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 132,
+        "card_class": "",
+    },
+    {
+        "card_name": "Seer",
+        "card_type": "Support",
+        "card_rarity": "Uncommon",
+        "card_index": 133,
+        "card_class": "",
+    },
     {
         "card_name": "Super Energy Removal 2",
+        "card_type": "Trainer",
         "card_rarity": "Uncommon",
         "card_index": 134,
+        "card_class": "",
     },
-    {"card_name": "Time Shard", "card_rarity": "Uncommon", "card_index": 135},
-    {"card_name": "Town Volunteers", "card_rarity": "Uncommon", "card_index": 136},
-    {"card_name": "Traveling Salesman", "card_rarity": "Uncommon", "card_index": 137},
-    {"card_name": "Undersea Ruins", "card_rarity": "Uncommon", "card_index": 138},
-    {"card_name": "Power Plant", "card_rarity": "Uncommon", "card_index": 139},
-    {"card_name": "Water Cube 01", "card_rarity": "Uncommon", "card_index": 140},
-    {"card_name": "Weakness Guard", "card_rarity": "Uncommon", "card_index": 141},
+    {
+        "card_name": "Time Shard",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 135,
+        "card_class": "",
+    },
+    {
+        "card_name": "Town Volunteers",
+        "card_type": "Support",
+        "card_rarity": "Uncommon",
+        "card_index": 136,
+        "card_class": "",
+    },
+    {
+        "card_name": "Traveling Salesman",
+        "card_type": "Support",
+        "card_rarity": "Uncommon",
+        "card_index": 137,
+        "card_class": "",
+    },
+    {
+        "card_name": "Undersea Ruins",
+        "card_type": "Stadium",
+        "card_rarity": "Uncommon",
+        "card_index": 138,
+        "card_class": "",
+    },
+    {
+        "card_name": "Power Plant",
+        "card_type": "Stadium",
+        "card_rarity": "Uncommon",
+        "card_index": 139,
+        "card_class": "",
+    },
+    {
+        "card_name": "Water Cube 01",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 140,
+        "card_class": "",
+    },
+    {
+        "card_name": "Weakness Guard",
+        "card_type": "Trainer",
+        "card_rarity": "Uncommon",
+        "card_index": 141,
+        "card_class": "",
+    },
     {
         "card_name": "Darkness Energy",
         "card_type": "Darkness",
         "card_rarity": "Rare",
         "card_index": 142,
+        "card_class": "",
     },
     {
         "card_name": "Metal Energy",
         "card_type": "Metal",
         "card_rarity": "Rare",
         "card_index": 143,
+        "card_class": "",
     },
     {
         "card_name": "Rainbow Energy",
         "card_type": "Rainbow",
         "card_rarity": "Rare",
         "card_index": 144,
+        "card_class": "",
     },
     {
         "card_name": "Boost Energy",
         "card_type": "Colorless",
         "card_rarity": "Uncommon",
         "card_index": 145,
+        "card_class": "",
     },
     {
         "card_name": "Crystal Energy",
         "card_type": "Colorless",
         "card_rarity": "Uncommon",
         "card_index": 146,
+        "card_class": "",
     },
     {
         "card_name": "Warp Energy",
         "card_type": "Colorless",
         "card_rarity": "Uncommon",
         "card_index": 147,
+        "card_class": "",
     },
     {
         "card_name": "Kingdra",
         "card_type": "Colorless",
         "card_rarity": "Rare Holo",
         "card_index": 148,
+        "card_class": "",
     },
     {
         "card_name": "Lugia",
         "card_type": "Colorless",
         "card_rarity": "Rare Holo",
         "card_index": 149,
+        "card_class": "",
     },
     {
         "card_name": "Nidoking",
         "card_type": "Colorless",
         "card_rarity": "Rare Holo",
         "card_index": 150,
+        "card_class": "",
     },
 ]
 
 
 class TestSetHtmlsSetup(TestCase):
-    DATA_PATH = "../data_files/set_htmls/"
+    DATA_PATH = "../data_files/"
 
     def setUp(self) -> None:
         pass
@@ -1233,6 +1539,12 @@ class TestSetHtmls(TestSetHtmlsSetup):
     # def test_parse_set_data(self):
     #     set_codes = input_file_parser.parse_set_data()
     #     print(set_codes)
+
+    def test_load_xy_primal_clash(self):
+        set_name = "XY - Primal Clash"
+        set_data_list = input_file_parser.load_set_data(self.DATA_PATH, set_name)
+        for card in set_data_list.card_dict.values():
+            print(card.to_dict())
 
     def test_load_aquapolis_set_htmls(self):
         set_data_list = self.load_set_data_count(1)
@@ -1275,7 +1587,7 @@ class TestSetHtmls(TestSetHtmlsSetup):
 
 
 class TestSetListHtmlsSetup(TestCase):
-    SET_LIST_PATH = "../data_files/set_list_htmls/"
+    SET_LIST_PATH = "../data_files/"
 
     def setUp(self) -> None:
         pass
@@ -1303,13 +1615,16 @@ class TestSetListHtmls(TestSetListHtmlsSetup):
 
     def test_load_named_file_aquapolis_set_list_htmls(self):
         set_name = "Aquapolis"
-        set_card_list = input_file_parser.get_pedia_set_data(
-            f"{self.SET_LIST_PATH}{set_name}.html"
+        set_card_list = input_file_parser.load_set_list_from_name(
+            self.SET_LIST_PATH, set_name
         )
-        for index, card in enumerate(set_card_list):
-            # print(card, aquapolis_set_list_compare[index])
-            assert card == aquapolis_set_list_compare[index]
-        assert aquapolis_set_list_compare == set_card_list
+        # f"{self.SET_LIST_PATH}{set_name}.html"
+        # )
+        for index, card in enumerate(set_card_list.card_list):
+            print(f"{card.to_dict()},")
+            # print(card.to_dict(), aquapolis_set_list_compare[index])
+            # assert card.to_dict() == aquapolis_set_list_compare[index]
+        assert aquapolis_set_list_compare == set_card_list.to_dict()
         # print(set_card_list)
 
     def test_load_aquapolis_set_list_htmls(self):
@@ -1317,9 +1632,10 @@ class TestSetListHtmls(TestSetListHtmlsSetup):
         assert type(set_data_list) is list
         assert len(set_data_list) == 1
         set_data = set_data_list[0]
-        assert len(set_data) == 186
+        # print(len(set_data.card_list))
+        assert len(set_data.card_list) == 186
         print(set_data)
-        assert aquapolis_set_list_compare == set_data
+        assert aquapolis_set_list_compare == set_data.to_dict()
 
         # for set_name in common_objects.get_set_name_list():
         #     print(set_name)
@@ -1327,49 +1643,59 @@ class TestSetListHtmls(TestSetListHtmlsSetup):
     def test_load_all_set_list_htmls(self):
         set_lists = self.load_all()
         assert len(set_lists) == len(common_objects.get_set_name_list())
-        # for set_list in set_lists:
-        #     print(set_list)
-        #     print(len(set_list))
+        for set_list in set_lists:
+
+            # print(set_list.set_name, len(set_list.card_list))
+            broken_indices = set_list.get_broken_indices()
+            card_rarities = set_list.get_rarities()
+            card_types = set_list.get_types()
+            if "" in card_types:
+                print("Set Name: ", set_list.set_name)
+                print("Set Types: ", set_list.get_types())
+                print("Set Rarities: ", card_rarities)
+                print("Set indexes: ", broken_indices)
+            # print(len(set_list))
 
 
-class TestLoadAllSetup(TestCase):
-    SET_PATH = "../data_files/set_htmls/"
-    SET_LIST_PATH = "../data_files/set_list_htmls/"
-
-    def setUp(self) -> None:
-        pass
-        # self.media_directory_info = config_file_handler.load_json_file_content().get("media_folders")
-
-        # __init__.patch_get_file_hash(self)
-        # __init__.patch_get_ffmpeg_metadata(self)
-        # __init__.patch_move_media_file(self)
-        # __init__.patch_extract_subclip(self)
-        # __init__.patch_update_processed_file(self)
-
-    def load_set_data_count(self, count):
-        set_data_list = []
-        for set_data in input_file_parser.load_set_data_dir(self.SET_PATH):
-            set_data_list.append(set_data)
-            if len(set_data_list) == count:
-                break
-        return set_data_list
-
-    def load_all_set(self):
-        return list(input_file_parser.load_set_data_dir(self.SET_PATH))
-
-    def load_set_list_data_count(self, count):
-        set_data_list = []
-        for set_data in input_file_parser.load_set_list_data_dir(self.SET_LIST_PATH):
-            set_data_list.append(set_data)
-            if len(set_data_list) == count:
-                break
-        return set_data_list
-
-    def load_all_set_list(self):
-        return list(input_file_parser.load_set_list_data_dir(self.SET_LIST_PATH))
-
-
-class TestLoadAll(TestLoadAllSetup):
-    def test_combine_data_collection(self):
-        for set_data in self.load_all_set():
-            print(set_data)
+#
+# class TestLoadAllSetup(TestCase):
+#     SET_PATH = "../data_files/set_htmls/"
+#     SET_LIST_PATH = "../data_files/set_list_htmls/"
+#
+#     def setUp(self) -> None:
+#         pass
+#         # self.media_directory_info = config_file_handler.load_json_file_content().get("media_folders")
+#
+#         # __init__.patch_get_file_hash(self)
+#         # __init__.patch_get_ffmpeg_metadata(self)
+#         # __init__.patch_move_media_file(self)
+#         # __init__.patch_extract_subclip(self)
+#         # __init__.patch_update_processed_file(self)
+#
+#     def load_set_data_count(self, count):
+#         set_data_list = []
+#         for set_data in input_file_parser.load_set_data_dir(self.SET_PATH):
+#             set_data_list.append(set_data)
+#             if len(set_data_list) == count:
+#                 break
+#         return set_data_list
+#
+#     def load_all_set(self):
+#         return list(input_file_parser.load_set_data_dir(self.SET_PATH))
+#
+#     def load_set_list_data_count(self, count):
+#         set_data_list = []
+#         for set_data in input_file_parser.load_set_list_data_dir(self.SET_LIST_PATH):
+#             set_data_list.append(set_data)
+#             if len(set_data_list) == count:
+#                 break
+#         return set_data_list
+#
+#     def load_all_set_list(self):
+#         return list(input_file_parser.load_set_list_data_dir(self.SET_LIST_PATH))
+#
+#
+# class TestLoadAll(TestLoadAllSetup):
+#     def test_combine_data_collection(self):
+#         for set_data in self.load_all_set():
+#             print(set_data)

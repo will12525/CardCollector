@@ -129,8 +129,16 @@ async function queryDB(data) {
     document.getElementById("rainbow_loading_bar").hidden = true
 }
 async function generatePack(data) {
-    document.getElementById("rainbow_loading_bar").hidden = false
     const url = "/generate_pack";
+    const dynamicContent = document.getElementById("card_container");
+    rainbow_loading_bar = document.getElementById("rainbow_loading_bar")
+    rainbow_loading_bar.hidden = false
+    const gifImage = document.createElement('img');
+    gifImage.src = '/static/pack_opening.gif';
+    dynamicContent.innerHTML = ""
+    dynamicContent.appendChild(gifImage);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
     let response = await fetch(url, {
         "method": "POST",
         "headers": {"Content-Type": "application/json"},
@@ -139,9 +147,8 @@ async function generatePack(data) {
         .then(htmlContent => {
             const dynamicContent = document.getElementById("card_container");
             dynamicContent.innerHTML = htmlContent;
-        })
-        .catch(error => console.error(error));
-    document.getElementById("rainbow_loading_bar").hidden = true
+        }).catch(error => console.error(error));
+    rainbow_loading_bar.hidden = true
 }
 
 async function applySortFilter(filter_str) {

@@ -12,14 +12,14 @@ from database_handler.db_setter import (
 )
 from database_handler.input_file_parser import (
     load_set_data_dir,
-    get_pedia_set_data,
-    get_all_cards_matching_name,
+    load_set_list_from_name,
+    # get_all_cards_matching_name,
 )
 
 
 class TestDBCreatorInit(TestCase):
     DB_PATH = "pokemon_card_data.db"
-    DATA_PATH = "../data_files/set_htmls/"
+    DATA_PATH = "../data_files/"
 
     def setUp(self) -> None:
         pass
@@ -201,144 +201,95 @@ class TestDBCreator(TestDBCreatorInit):
         print(sql_insert_card_info_table)
         print(sql_create_card_info_table)
 
-    def find_index(self, new_card, set_card_list):
-        found_card_matches = get_all_cards_matching_name(
-            new_card.get(common_objects.CARD_NAME_COLUMN), set_card_list
-        )
-        # if len(found_card_matches) == 1:
-        #     found_card = found_card_matches[0]
-        #     # print(f"Found card: {found_card}")
-        #     if not new_card.get(common_objects.CARD_INDEX_COLUMN):
-        #         new_card[common_objects.CARD_INDEX_COLUMN] = found_card.get(
-        #             common_objects.CARD_INDEX_COLUMN
-        #         )
-        #     new_card[common_objects.CARD_RARITY_COLUMN] = found_card[
-        #         common_objects.CARD_RARITY_COLUMN
-        #     ]
-        #     new_card[common_objects.CARD_TYPE_COLUMN] = found_card.get(
-        #         common_objects.CARD_TYPE_COLUMN, ""
-        #     )
-        # else:
-        #     print("\n", json.dumps(new_card, indent=4))
-        #     print(
-        #         "https://www.tcgplayer.com/product/"
-        #         + str(new_card["tcgp_id"])
-        #         + "/pokmeon-"
-        #         + new_card["tcgp_path"]
-        #     )
-        #     print(
-        #         "Possible matches: ",
-        #         "\n".join([str(card) for card in found_card_matches]),
-        #     )
-        #     provided_index = int(input("Provide index: ").replace("\n", "").strip())
-        #     if provided_index:
-        #         print(f"Applying provided index: {provided_index}")
-        #         # print(type(provided_index))
-        #         new_card[common_objects.CARD_INDEX_COLUMN] = provided_index
-        #     return 1
-
-        if not new_card.get(common_objects.CARD_INDEX_COLUMN):
-            print(json.dumps(new_card, indent=4))
-            print(
-                "https://www.tcgplayer.com/product/"
-                + str(new_card["tcgp_id"])
-                + "/pokmeon-"
-                + new_card["tcgp_path"]
-            )
-            # provided_index = int(input("Provide index: ").replace("\n", "").strip())
-            # if provided_index:
-            #     print(f"Applying provided index: {provided_index}")
-            #     # print(type(provided_index))
-            #     new_card[common_objects.CARD_INDEX_COLUMN] = provided_index
-            # found_card_matches = get_all_cards_matching_name(
-            #     new_card.get(common_objects.CARD_NAME_COLUMN), set_card_list
-            # )
-            # filtered_card_matches = []
-            # for card_match in found_card_matches:
-            #     if not db_getter_connection.get_card_with_set_index(
-            #             {
-            #                 common_objects.CARD_INDEX_COLUMN: card_match.get(
-            #                     common_objects.CARD_INDEX_COLUMN
-            #                 ),
-            #                 common_objects.SET_ID_COLUMN: set_item.get(
-            #                     common_objects.ID_COLUMN
-            #                 ),
-            #             }
-            #     ):
-            #         filtered_card_matches.append(card_match)
-
-            if len(found_card_matches) == 1:
-                found_card = found_card_matches[0]
-                new_card[common_objects.CARD_INDEX_COLUMN] = found_card.get(
-                    common_objects.CARD_INDEX_COLUMN
-                )
-
-                print(new_card)
-            else:
-                print(
-                    "Possible matches: ",
-                    "\n".join([str(card) for card in found_card_matches]),
-                )
-                # provided_index = int(input("Provide index: ").replace("\n", "").strip())
-                # if provided_index:
-                #     print(f"Applying provided index: {provided_index}")
-                #     # print(type(provided_index))
-                #     new_card[common_objects.CARD_INDEX_COLUMN] = provided_index
-                return 1
-        # else:
-        #     if len(found_card_matches) == 1:
-        #         found_card = found_card_matches[0]
-        #         input(found_card)
-
-        return 0
-
     def test_same_db(self):
-        SET_PATH = "../data_files/set_htmls/"
-        SET_LIST_PATH = "../data_files/set_list_htmls/"
-        input_required = 0
-        pedia_cache = {}
+        SET_PATH = "../data_files/"
+        SET_LIST_PATH = "../data_files/"
+        cards_missing_index = 0
+        cards_missing_rarity = 0
+        cards_missing_type = 0
+        cards_missing_class = 0
+        card_count = 0
+        rarity_names = {}
+        # pedia_cache = {}
+        #
+        # for set_name in common_objects.get_set_name_list():
+        #     pedia_cache[set_name] = load_set_list_from_name(SET_LIST_PATH, set_name)
+        #
+        # assert len(pedia_cache) == common_objects.get_set_count()
+
+        set_data_list = list(load_set_data_dir(SET_PATH))
+
+        print(len(set_data_list))
+        assert len(set_data_list) == 106
+
         self.erase_db()
-        with DBCreator() as db_setter_connection:
-            db_setter_connection.create_db()
 
-            with DatabaseHandler(
-                file_name="pokemon_card_data_backup.db"
-            ) as db_backup_handler:
-                # db_backup_handler.set_card_index(
-                #     {
-                #         common_objects.TCGP_ID_COLUMN: 83510,
-                #         common_objects.CARD_INDEX_COLUMN: 2,
-                #     }
+        # with DatabaseHandler(
+        #     file_name="pokemon_card_data_backup.db"
+        # ) as db_backup_handler:
+        # db_backup_handler.set_card_index(
+        #     {
+        #         common_objects.TCGP_ID_COLUMN: 83510,
+        #         common_objects.CARD_INDEX_COLUMN: 2,
+        #     }
+        # )
+        for set_data in set_data_list:
+            assert common_objects.get_set_index(set_data.set_name)
+            card_count += len(set_data.card_dict)
+            print(set_data.to_dict())
+            # print(set_data)
+            for tcgp_id, card_data in set_data.card_dict.items():
+                # set_name = card_data.card_set.set_name
+                # backup_card_data = db_backup_handler.get_card_from_id(
+                #     {common_objects.TCGP_ID_COLUMN: tcgp_id}
                 # )
-                for set_data in load_set_data_dir(SET_PATH):
-                    # print(set_data)
-                    for tcgp_id, card_data in set_data.items():
-                        set_name = card_data.get(common_objects.SET_NAME_COLUMN)
-                        if set_name not in pedia_cache:
-                            pedia_cache[set_name] = get_pedia_set_data(
-                                f"{SET_LIST_PATH}{set_name}.html"
-                            )
-                        backup_card_data = db_backup_handler.get_card_from_id(
-                            {common_objects.TCGP_ID_COLUMN: tcgp_id}
-                        )
-                        # print(set_name, pedia_cache[set_name])
-                        input_required += self.find_index(
-                            card_data, pedia_cache[set_name]
-                        )
 
-                        print(card_data, backup_card_data)
-                        assert card_data["card_name"] == backup_card_data["card_name"]
-                        assert card_data["tcgp_path"] == backup_card_data["tcgp_path"]
-                        if card_data["card_index"]:
-                            assert (
-                                card_data["card_index"]
-                                == backup_card_data["card_index"]
-                            )
-                        else:
-                            print("Missing Index", card_data, backup_card_data)
-                    db_setter_connection.add_set_card_data(set_data)
+                # print(
+                #     json.dumps(card_data.to_dict(), indent=4),
+                #     json.dumps(backup_card_data, indent=4),
+                # )
+                if rarity_names.get(card_data.rarity):
+                    rarity_names[card_data.rarity] += 1
+                else:
+                    rarity_names[card_data.rarity] = 1
+
+                if not card_data.card_index:
+                    cards_missing_index += 1
+                assert cards_missing_index <= 2542
+                if not card_data.card_type:
+                    cards_missing_type += 1
+                assert cards_missing_type <= 4441
+                if not card_data.card_class:
+                    cards_missing_class += 1
+                assert cards_missing_class <= 2602
+                if not card_data.rarity:
+                    cards_missing_rarity += 1
+                    # input(json.dumps(card_data.to_dict(), indent=4))
+                assert cards_missing_rarity <= 622
+
+                # assert card_data.card_name == backup_card_data["card_name"]
+                # assert card_data.tcgp_path == backup_card_data["tcgp_path"]
+                # if card_data.card_index:
+                #     assert card_data.card_index == backup_card_data["card_index"]
+                # else:
+                #     print(
+                #         "Missing Index",
+                #         card_data.to_dict(),
+                #         backup_card_data,
+                #     )
 
         # Original required 2802 user input
         # New requires 3196 user input
-        print("input_required: ", input_required)
-        assert input_required <= 3196
+        print("card_count: ", card_count)
+        print("cards_missing_index: ", cards_missing_index)
+        print("cards_missing_type: ", cards_missing_type)
+        print("cards_missing_class: ", cards_missing_class)
+        print("cards_missing_rarity: ", cards_missing_rarity)
+        assert card_count == 15015
+
+        print(json.dumps(rarity_names, indent=4))
+
+        with DBCreator() as db_setter_connection:
+            db_setter_connection.create_db()
+            for set_data in set_data_list:
+                db_setter_connection.add_set_card_data(set_data)
