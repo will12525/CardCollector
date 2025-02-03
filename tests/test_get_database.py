@@ -38,19 +38,20 @@ class TestDBGetterBase(TestCase):
         # __init__.patch_extract_subclip(self)
         # __init__.patch_update_processed_file(self)
 
-    # def erase_db(self):
-    #     if os.path.exists(self.DB_PATH):
-    #         os.remove(self.DB_PATH)
+    def erase_db(self):
+        if os.path.exists(self.DB_PATH):
+            os.remove(self.DB_PATH)
 
-    # def populate_db(self, count):
-    #     with DBCreator(common_objects.DBType.PHYSICAL) as db_setter_connection:
-    #         db_setter_connection.create_db()
-    #         index = 0
-    #         for set_data in load_set_data_dir(self.DATA_PATH):
-    #             db_setter_connection.add_set_card_data(set_data)
-    #             index += 1
-    #             if index == count:
-    #                 break
+    def populate_db(self):
+        with DBCreator() as db_setter_connection:
+            db_setter_connection.create_db()
+            # index = 0
+            # for set_data in load_set_data_dir(self.DATA_PATH):
+            #     db_setter_connection.add_set_card_data(set_data)
+            #     index += 1
+            #     if index == count:
+            #         break
+
     #
     # def populate_specific_set_data(self, set_path):
     #     with DBCreator(common_objects.DBType.PHYSICAL) as db_setter_connection:
@@ -63,6 +64,94 @@ class TestDBGetterBase(TestCase):
         with DatabaseHandler() as db_getter:
             db_getter.reset_have_want()
             db_getter.reset_users()
+
+
+class TestUserHandling(TestDBGetterBase):
+    def test_user_registration(self):
+        # self.reset_db()
+        self.erase_db()
+        self.populate_db()
+        db_request_willow = {
+            common_objects.USER_NAME_COLUMN: "Willow",
+            common_objects.USER_PASS_COLUMN: "12345",
+        }
+        db_request_leonard = {
+            common_objects.USER_NAME_COLUMN: "Leonard",
+            common_objects.USER_PASS_COLUMN: "54321",
+        }
+
+        with DatabaseHandler(common_objects.DBType.PHYSICAL) as db_getter_connection:
+            # db_getter_connection.create_tables()
+            # db_getter_connection.reset_users()
+            assert db_getter_connection.add_user(db_request_willow)
+            assert db_getter_connection.get_user_id(db_request_willow) == 1
+            assert not db_getter_connection.add_user(db_request_willow)
+            assert db_getter_connection.get_user_id(db_request_willow) == 1
+            assert db_getter_connection.add_user(db_request_leonard)
+            assert db_getter_connection.get_user_id(db_request_leonard) == 2
+
+    def test_user_login(self):
+        # self.reset_db()
+        self.erase_db()
+        self.populate_db()
+        db_request_willow = {
+            common_objects.USER_NAME_COLUMN: "Willow",
+            common_objects.USER_PASS_COLUMN: "12345",
+        }
+        db_request_willow_invalid = {
+            common_objects.USER_NAME_COLUMN: "Willow",
+            common_objects.USER_PASS_COLUMN: "54321",
+        }
+        db_request_leonard = {
+            common_objects.USER_NAME_COLUMN: "Leonard",
+            common_objects.USER_PASS_COLUMN: "54321",
+        }
+
+        with DatabaseHandler(common_objects.DBType.PHYSICAL) as db_getter_connection:
+            # db_getter_connection.create_tables()
+            # db_getter_connection.reset_users()
+            willow_user_id = db_getter_connection.add_user(db_request_willow)
+            leonard_user_id = db_getter_connection.add_user(db_request_leonard)
+
+            assert willow_user_id
+            assert leonard_user_id
+            assert db_getter_connection.get_user_id(db_request_willow) == willow_user_id
+            assert (
+                db_getter_connection.get_user_hash(db_request_willow).get(
+                    common_objects.USER_PASS_COLUMN
+                )
+                == db_request_willow[common_objects.USER_PASS_COLUMN]
+            )
+            assert (
+                db_getter_connection.get_user_id(db_request_leonard) == leonard_user_id
+            )
+
+            assert db_getter_connection.user_login(db_request_willow) == willow_user_id
+            assert (
+                db_getter_connection.user_login(db_request_leonard) == leonard_user_id
+            )
+            assert not db_getter_connection.user_login(db_request_willow_invalid)
+            # assert db_getter_connection.get_user_id(db_request_leonard) == 2
+
+            assert db_getter_connection.get_user_id(db_request_willow) == willow_user_id
+            assert (
+                db_getter_connection.get_user_id(db_request_leonard) == leonard_user_id
+            )
+
+    def test_update_user_pack_time(self):
+        # self.reset_db()
+        self.erase_db()
+        self.populate_db()
+        db_request_willow = {
+            common_objects.USER_NAME_COLUMN: "Willow",
+            common_objects.USER_PASS_COLUMN: "12345",
+        }
+
+        with DatabaseHandler(common_objects.DBType.PHYSICAL) as db_getter_connection:
+            db_request_willow[common_objects.ID_COLUMN] = db_getter_connection.add_user(
+                db_request_willow
+            )
+            db_getter_connection.set_user_pack_time(db_request_willow)
 
 
 class TestPackGenerator(TestDBGetterBase):

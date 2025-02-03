@@ -18,9 +18,13 @@
             <span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <a class="navbar-brand" href="#">{{ username }}</a>
             </ul>
             <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
             </ul>
+            <form action="/logout" method="post">
+                <button class="btn btn-outline-success" type="submit">Logout</button>
+            </form>
         </div>
     </div>
 </nav>
@@ -79,8 +83,9 @@
                 <ul class="list-group list-group-flush">
                 </ul>
                 <div id="metadata_card_body" class="card-body">
+                    {% if python_metadata and 'set_list' in python_metadata and python_metadata.get('set_list') %}
                     <h5 class="card-title" id="primary_card_set_title">{{ python_metadata.get('set_name',
-                        python_metadata['set_list'][0].get('set_name')) }}</h5>
+                        python_metadata.get('set_list')[0].get('set_name')) }}</h5>
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button"
                                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -88,13 +93,16 @@
                             Set list
                         </button>
                         <ul class="dropdown-menu" style="height:400px; overflow-y:auto;">
-                            {% for set_data in python_metadata['set_list']: %}
+                            {% for set_data in python_metadata.get('set_list'): %}
                             <li><a class="dropdown-item"
                                    href="javascript:getSetCardList('{{ set_data.get('set_name') }}')">{{
-                                set_data['set_name'] }}</a></li>
+                                set_data.get('set_name') }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>
+                    {% else %}
+                    <h5 class="card-title">Missing Set Data</h5>
+                    {% endif %}
                 </div>
                 <ul class="list-group list-group-flush">
                 </ul>

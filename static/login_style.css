@@ -1,0 +1,41 @@
+#container {
+    width: 300px;
+    margin: 100px auto;
+    padding: 20px;
+    border: 1px solid black;
+    border-radius: 5px;
+    text-align: center; /* Center the content */
+}
+
+#container h2 {
+    margin-bottom: 20px;
+}
+
+#container input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+}
+
+#container button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#container a {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#regMessage, #loginMessage {
+  margin-top: 10px;
+}
+body {
+    background-color:aquamarine;
+}

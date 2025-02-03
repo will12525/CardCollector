@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register/Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static',filename='login_style.css') | safe }}">
+</head>
+<body>
+
+<div id="container"></div>
+
+
+<script>
+    const container = document.getElementById('container');
+
+    function showRegisterForm() {
+        container.innerHTML = `
+            <h2>Register</h2>
+            <form id="registerForm">
+                <input type="text" id="regUsername" placeholder="Username" required><br>
+                <input type="password" id="regPassword" placeholder="Password" required><br>
+                <button type="submit">Register</button>
+            </form>
+            <p>Already have an account? <a href="#" onclick="showLoginForm()">Login</a></p>
+            <div id="regMessage"></div>
+        `;
+
+        const form = document.getElementById('registerForm');
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const messageDiv = document.getElementById('regMessage');
+
+            fetch('/register', {  // Your Flask route
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded', // Important for form data
+                },
+                body: `username=${username}&password=${password}`, // Encode form data
+            })
+            .then(response => response.text())
+            .then(message => {
+                if(message.includes("successful")){
+                  showLoginForm(message);
+                } else {
+                    messageDiv.textContent = message; // Display the message from Flask (success/error)
+                }
+            });
+        });
+    }
+
+    function showLoginForm(load_message) {
+        container.innerHTML = `
+            <h2>Login</h2>
+            <form id="loginForm">
+                <input type="text" id="loginUsername" placeholder="Username" required><br>
+                <input type="password" id="loginPassword" placeholder="Password" required><br>
+                <button type="submit">Login</button>
+            </form>
+            <p>Don't have an account? <a href="#" onclick="showRegisterForm()">Register</a></p>
+            <div id="loginMessage"></div>
+        `;
+        if (load_message) {
+            document.getElementById('loginMessage').textContent = load_message
+        }
+
+        const form = document.getElementById('loginForm');
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const messageDiv = document.getElementById('loginMessage');
+
+            fetch('/login', {  // Your Flask route
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `username=${username}&password=${password}`,
+            })
+            .then(response => response.text())
+            .then(message => {
+              messageDiv.textContent = message;
+                if(!message.includes("Invalid")){
+                  window.location.href = "/"; // Redirect to the root ("/")
+                }
+
+            });
+        });
+    }
+
+
+    // Initial view (you can decide which form to show first)
+    showLoginForm(''); // Or showRegisterForm();
+
+</script>
+
+</body>
+</html>

@@ -22,6 +22,8 @@ SET_CARD_COUNT_COLUMN = "set_card_count"
 
 USER_INFO_TABLE = "user_info"
 USER_NAME_COLUMN = "user_name"
+USER_PASS_COLUMN = "user_pass_hash"
+LAST_PACK_OPEN_TIME_COLUMN = "last_pack_open_time"
 
 
 USER_COLLECTION_TABLE = "user_collection"
@@ -33,6 +35,7 @@ STATE_GIFT_COLUMN = "state_gift"
 
 PRICE_COLUMN = "price"
 
+USER_PACK_DELAY = 1  # Hour
 
 default_card_dict = {
     CARD_NAME_COLUMN: "",

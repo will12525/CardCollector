@@ -1,6 +1,6 @@
 import json
 import pathlib
-
+import datetime
 from . import common_objects
 from .db_access import DBConnection
 
@@ -238,5 +238,38 @@ class DatabaseHandler(DBConnection):
     def generate_pack_from_set(self, params):
         return self.get_data_from_db(
             f"SELECT * FROM card_info INNER JOIN {common_objects.SET_INFO_TABLE} ON {common_objects.CARD_INFO_TABLE}.{common_objects.SET_ID_COLUMN} = {common_objects.SET_INFO_TABLE}.{common_objects.ID_COLUMN} WHERE {common_objects.SET_INFO_TABLE}.{common_objects.SET_NAME_COLUMN} = :set_name ORDER BY RANDOM() LIMIT :card_count;",
+            params,
+        )
+
+    def get_user_id(self, params):
+        return self.get_row_id(
+            f"SELECT {common_objects.ID_COLUMN} FROM {common_objects.USER_INFO_TABLE} WHERE {common_objects.USER_NAME_COLUMN} = :{common_objects.USER_NAME_COLUMN};",
+            params,
+        )
+
+    def user_login(self, params):
+        return self.get_row_id(
+            f"SELECT {common_objects.ID_COLUMN} FROM {common_objects.USER_INFO_TABLE} WHERE {common_objects.USER_NAME_COLUMN} = :{common_objects.USER_NAME_COLUMN} AND {common_objects.USER_PASS_COLUMN} = :{common_objects.USER_PASS_COLUMN};",
+            params,
+        )
+
+    def get_user_hash(self, params):
+        return self.get_data_from_db_first_result(
+            f"SELECT {common_objects.ID_COLUMN}, {common_objects.USER_PASS_COLUMN} FROM {common_objects.USER_INFO_TABLE} WHERE {common_objects.USER_NAME_COLUMN} = :{common_objects.USER_NAME_COLUMN};",
+            params,
+        )
+
+    def set_user_pack_time(self, params):
+        now = datetime.datetime.now(datetime.UTC)
+        iso_string = now.isoformat()
+        params[common_objects.LAST_PACK_OPEN_TIME_COLUMN] = iso_string
+        return self.add_data_to_db(
+            f"UPDATE {common_objects.USER_INFO_TABLE} SET {common_objects.LAST_PACK_OPEN_TIME_COLUMN} = :{common_objects.LAST_PACK_OPEN_TIME_COLUMN} WHERE {common_objects.USER_NAME_COLUMN}=:{common_objects.USER_NAME_COLUMN} AND {common_objects.ID_COLUMN}=:{common_objects.USER_ID_COLUMN};",
+            params,
+        )
+
+    def get_user_pack_time(self, params):
+        return self.get_data_from_db_first_result(
+            f"SELECT {common_objects.LAST_PACK_OPEN_TIME_COLUMN} FROM {common_objects.USER_INFO_TABLE} WHERE {common_objects.USER_NAME_COLUMN} = :{common_objects.USER_NAME_COLUMN} AND {common_objects.ID_COLUMN}=:{common_objects.USER_ID_COLUMN};",
             params,
         )

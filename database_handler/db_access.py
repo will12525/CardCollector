@@ -6,7 +6,7 @@ import sqlite3
 from . import common_objects
 from .common_objects import DBType
 
-sql_insert_user_info_table = f"INSERT OR IGNORE INTO {common_objects.USER_INFO_TABLE} VALUES (null, :{common_objects.USER_NAME_COLUMN});"
+sql_insert_user_info_table = f"INSERT INTO {common_objects.USER_INFO_TABLE} ({common_objects.USER_NAME_COLUMN}, {common_objects.USER_PASS_COLUMN}) VALUES (:{common_objects.USER_NAME_COLUMN}, :{common_objects.USER_PASS_COLUMN});"
 
 
 def print_db_traceback(error, message):
