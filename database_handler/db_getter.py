@@ -95,10 +95,6 @@ class DatabaseHandler(DBConnection):
         if filter_ownership:
             if filter_ownership == "have":
                 where_clauses.append(f"{common_objects.OWN_COUNT_COLUMN}>0")
-            elif filter_ownership == "want":
-                where_clauses.append(f"{common_objects.STATE_WANT_COLUMN}>0")
-            else:
-                pass
 
         if where_clauses:
             where_clause = "WHERE " + " AND ".join(where_clauses)
@@ -113,8 +109,8 @@ class DatabaseHandler(DBConnection):
                 params,
             )
         )
-
         if set_name:
+            ret_data[common_objects.SET_NAME_COLUMN] = set_name
             ret_data["count_cards"] = common_objects.get_set_card_count(set_name)
             if ret_data.get("count_have", 0) > 0:
                 ret_data["percent_complete"] = round(
@@ -193,15 +189,24 @@ class DatabaseHandler(DBConnection):
         )
 
     def set_have(self, params):
+        # Update an existing row
         affected_row = self.add_data_to_db(
             f"UPDATE {common_objects.USER_COLLECTION_TABLE} SET {common_objects.OWN_COUNT_COLUMN} = {common_objects.OWN_COUNT_COLUMN} + 1 WHERE {common_objects.CARD_ID_COLUMN}=:{common_objects.CARD_ID_COLUMN} AND {common_objects.USER_ID_COLUMN}=:{common_objects.USER_ID_COLUMN};",
             params,
         )
+        # If an existing row doesn't exist, add a new row
         if not affected_row:
             self.add_data_to_db(
-                f"INSERT INTO {common_objects.USER_COLLECTION_TABLE} VALUES (null, :{common_objects.USER_ID_COLUMN}, :{common_objects.CARD_ID_COLUMN}, :{common_objects.OWN_COUNT_COLUMN});",
+                f"INSERT INTO {common_objects.USER_COLLECTION_TABLE} ({common_objects.USER_ID_COLUMN}, {common_objects.CARD_ID_COLUMN}, {common_objects.OWN_COUNT_COLUMN}) VALUES (:{common_objects.USER_ID_COLUMN}, :{common_objects.CARD_ID_COLUMN}, 1);",
                 params,
             )
+
+        # Update the parameters object to include the current own count
+        params[common_objects.OWN_COUNT_COLUMN] = self.get_row_item(
+            f"SELECT {common_objects.OWN_COUNT_COLUMN} FROM {common_objects.USER_COLLECTION_TABLE} WHERE {common_objects.USER_ID_COLUMN}=:{common_objects.USER_ID_COLUMN} AND {common_objects.CARD_ID_COLUMN}=:{common_objects.CARD_ID_COLUMN};",
+            params,
+            common_objects.OWN_COUNT_COLUMN,
+        )
 
     def set_want(self, params):
         return self.get_data_from_db(

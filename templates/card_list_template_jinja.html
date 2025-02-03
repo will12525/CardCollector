@@ -1,11 +1,12 @@
 <div class="col-md-12">
     <div class="card mb-3" style="background-color:Linen;">
-        <div class="card-header">Data</div>
+        <div class="card-header">Data:
+            <span style="float: right;">You're doing a good job. You can take a break. I love you.</span>
+        </div>
         <div class="row g-0">
             <div class="col-md-4">
                 <div class="card-body">
-                    <p class="card-text">You're doing a good job. You can take a break. I love
-                        you.</p>
+                    <p class="card-text">Set Name: {{ meta_data.get("set_name", 'Missing set name') }}</p>
                 </div>
             </div>
             <div class="col-md-4">

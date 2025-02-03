@@ -391,19 +391,24 @@ class TestIconCollector(TestDBGetterBase):
             common_objects.USER_ID_COLUMN: user_id,
         }
         card_increment_data = {
-            common_objects.OWN_COUNT_COLUMN: 1,
+            common_objects.OWN_COUNT_COLUMN: 0,
             common_objects.CARD_ID_COLUMN: None,
             common_objects.USER_ID_COLUMN: user_id,
         }
+        user_info = {
+            common_objects.USER_NAME_COLUMN: "Willow",
+            common_objects.USER_PASS_COLUMN: "12345",
+        }
         self.reset_db()
         with DatabaseHandler(common_objects.DBType.PHYSICAL) as db_getter_connection:
-            db_getter_connection.add_user({common_objects.USER_NAME_COLUMN: "Willow"})
+            db_getter_connection.add_user(user_info)
             base_set_card_list = db_getter_connection.get_all_set_card_data(set_request)
-            print(base_set_card_list[0])
+            # print(base_set_card_list[0])
             card_increment_data[common_objects.CARD_ID_COLUMN] = base_set_card_list[
                 0
             ].get(common_objects.ID_COLUMN)
             for i in range(10):
+                print(card_increment_data)
                 db_getter_connection.set_have(card_increment_data)
                 base_set_card_list = db_getter_connection.get_all_set_card_data(
                     set_request
@@ -414,6 +419,7 @@ class TestIconCollector(TestDBGetterBase):
                     first_card[common_objects.ID_COLUMN]
                     == card_increment_data[common_objects.CARD_ID_COLUMN]
                 )
+                assert card_increment_data[common_objects.OWN_COUNT_COLUMN] == (i + 1)
 
     def test_query_base_set_user_collection_half(self):
         set_name = "Base Set (Shadowless)"

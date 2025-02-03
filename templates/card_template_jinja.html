@@ -1,32 +1,24 @@
-<div class="col-lg-3 my-class">
+<div class="col-lg-2 my-class">
     <div class="card my-content-card">
         <div class="card-header d-flex justify-content-between align-items-center">
+            {% if card_data and 'own_count' in card_data and card_data['own_count'] %}
             <a id="card_header_title"
                href="https://www.tcgplayer.com/product/{{ card_data['tcgp_id'] }}/pokmeon-{{ card_data['tcgp_path'] }}"
                target="_blank" rel="noopener noreferrer">{{ card_data["card_name"] }}</a>
+            {% endif %}
             <div data-mdb-input-init class="form-outline">
-                <span>#</span>
-                {% if card_data['card_index'] %}
-                <input type="number" class="input_sizing card_index_input_class"
-                       data-extra-data="{{ card_data['tcgp_id'] }}"
-                       value="{{ card_data.get('card_index', 0) }}" onchange="update_card_index(event)">
+                {% if card_data and 'card_index' in card_data and card_data['card_index'] %}
+                <span>#{{ card_data.get('card_index', '??') }}</span>
                 {% else %}
-                <input type="number" class="input_sizing card_index_input_class"
-                       data-extra-data="{{ card_data['tcgp_id'] }}" onchange="update_card_index(event)">
+                <span>#??</span>
                 {% endif %}
             </div>
         </div>
+        {% if card_data and 'own_count' in card_data and card_data['own_count'] %}
         <div class="card-body">
             <img id="card_image" class="img-fluid" loading="lazy"
                  src="/static/card_images/{{ card_data['tcgp_id'] }}.jpg" onerror="apply_default_image(this)">
         </div>
-        <div class="card-footer ">
-            <h6>
-                {% if card_data and 'own_count' in card_data and card_data['own_count'] %}
-                Have: {{ card_data['own_count'] }}
-                {% endif %}
-                <span style="float:right;"> {{ card_data["set_name"] }} </span>
-            </h6>
-        </div>
+        {% endif %}
     </div>
 </div>

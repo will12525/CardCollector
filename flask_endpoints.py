@@ -261,15 +261,9 @@ def generate_pack():
                 data["set_list"] = db_getter_connection.get_sets()
                 # Update user collection with the new pack data
                 for card in data["set_card_list"]:
-                    db_getter_connection.set_have(
-                        {
-                            common_objects.OWN_COUNT_COLUMN: 1,
-                            common_objects.CARD_ID_COLUMN: card.get(
-                                common_objects.ID_COLUMN
-                            ),
-                            common_objects.USER_ID_COLUMN: session.get("user_id"),
-                        }
-                    )
+                    card[common_objects.CARD_ID_COLUMN] = card[common_objects.ID_COLUMN]
+                    card[common_objects.USER_ID_COLUMN] = session.get("user_id")
+                    db_getter_connection.set_have(card)
     if data:
         return render_template(
             "card_list_template_jinja.html",
