@@ -93,4 +93,4 @@ class Pack:
             reverse_foil = random.choice(reverse_foil_candidates)
             reverse_foil["foil_type"] = "Reverse Holo"  # Set the foil type
 
-        return pulled_cards
+        return [x for x in pulled_cards if x is not None]
