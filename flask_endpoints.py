@@ -172,16 +172,16 @@ def get_set_card_list_html():
     if json_request := request.get_json():
         with DatabaseHandler() as db_getter_connection:
             print(json_request)
+            set_name = json_request.get(
+                common_objects.SET_NAME_COLUMN,
+                common_objects.get_set_name_from_index(1),
+            )
             meta_data.update(
                 db_getter_connection.query_collection(
-                    json_request.get(
-                        common_objects.SET_NAME_COLUMN,
-                        common_objects.get_set_name_from_index(1),
-                    ),
+                    set_name,
                     json_request.get("filter_str"),
                     json_request.get("card_name_search_query"),
                     json_request.get("filter_ownership"),
-                    json_request.get("card_season_search_query"),
                     session.get("user_id"),
                 )
             )
@@ -204,7 +204,6 @@ def get_set_card_list():
                     json_request.get("filter_str"),
                     json_request.get("card_name_search_query"),
                     json_request.get("filter_ownership"),
-                    json_request.get("card_season_search_query"),
                     session.get("user_id"),
                 )
             )

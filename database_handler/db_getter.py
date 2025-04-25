@@ -64,7 +64,6 @@ class DatabaseHandler(DBConnection):
         filter_str,
         card_name_search_query,
         filter_ownership,
-        card_set_search_query,
         user_id,
     ):
         print(set_name)
@@ -85,12 +84,6 @@ class DatabaseHandler(DBConnection):
                 f"{common_objects.CARD_NAME_COLUMN} LIKE :card_name_search_query"
             )
             params["card_name_search_query"] = f"%{card_name_search_query}%"
-
-        if card_set_search_query:
-            where_clauses.append(
-                f"{common_objects.SET_INFO_TABLE}.{common_objects.SET_NAME_COLUMN} LIKE :card_season_search_query"
-            )
-            params["card_season_search_query"] = f"%{card_set_search_query}%"
 
         if filter_ownership:
             if filter_ownership == "have":

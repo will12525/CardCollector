@@ -156,7 +156,6 @@ async function applySortFilter(filter_str) {
         "set_name": document.getElementById("primary_card_set_title").innerText,
         "filter_str": filter_str,
         "card_name_search_query": document.getElementById("card_name_search_query_text_field").value,
-        "card_season_search_query": document.getElementById("card_season_search_query_text_field").value,
         "filter_ownership": document.getElementById("filter_ownership").textContent
     };
     queryDB(data)
@@ -167,7 +166,6 @@ async function generatePackButton(filter_str) {
         "set_name": document.getElementById("primary_card_set_title").innerText,
         "filter_str": filter_str,
         "card_name_search_query": document.getElementById("card_name_search_query_text_field").value,
-        "card_season_search_query": document.getElementById("card_season_search_query_text_field").value,
         "filter_ownership": document.getElementById("filter_ownership").textContent,
         "user_id": 1
     };
@@ -178,7 +176,6 @@ async function applySearchTerm() {
         "set_name": document.getElementById("primary_card_set_title").innerText,
         "filter_str": document.getElementById("sort_by_selected_item").textContent,
         "card_name_search_query": document.getElementById("card_name_search_query_text_field").value,
-        "card_season_search_query": document.getElementById("card_season_search_query_text_field").value,
         "filter_ownership": document.getElementById("filter_ownership").textContent
     };
     queryDB(data)
@@ -188,7 +185,6 @@ async function applySeasonSearchTerm() {
         "set_name": document.getElementById("primary_card_set_title").innerText,
         "filter_str": document.getElementById("sort_by_selected_item").textContent,
         "card_name_search_query": document.getElementById("card_name_search_query_text_field").value,
-        "card_season_search_query": document.getElementById("card_season_search_query_text_field").value,
         "filter_ownership": document.getElementById("filter_ownership").textContent
     };
     queryDB(data)
@@ -198,7 +194,6 @@ async function applyFilterOwnership(filter_ownership) {
         "set_name": document.getElementById("primary_card_set_title").innerText,
         "filter_str": document.getElementById("sort_by_selected_item").textContent,
         "card_name_search_query": document.getElementById("card_name_search_query_text_field").value,
-        "card_season_search_query": document.getElementById("card_season_search_query_text_field").value,
         "filter_ownership": filter_ownership
     };
     updateSpanText("filter_ownership", filter_ownership)
@@ -209,7 +204,6 @@ async function getSetCardList(set_name) {
         "set_name": set_name,
         "filter_str": document.getElementById("sort_by_selected_item").textContent,
         "card_name_search_query": document.getElementById("card_name_search_query_text_field").value,
-        "card_season_search_query": document.getElementById("card_season_search_query_text_field").value,
         "filter_ownership": document.getElementById("filter_ownership").textContent
     };
     queryDB(data)
@@ -226,6 +220,3 @@ document.addEventListener("DOMContentLoaded", function(event){
     console.log(data)
     queryDB(data)
 });
-
-
-
