@@ -193,6 +193,7 @@ class DatabaseHandler(DBConnection):
                 f"INSERT INTO {common_objects.USER_COLLECTION_TABLE} ({common_objects.USER_ID_COLUMN}, {common_objects.CARD_ID_COLUMN}, {common_objects.OWN_COUNT_COLUMN}) VALUES (:{common_objects.USER_ID_COLUMN}, :{common_objects.CARD_ID_COLUMN}, 1);",
                 params,
             )
+            params["new"] = True
 
         # Update the parameters object to include the current own count
         params[common_objects.OWN_COUNT_COLUMN] = self.get_row_item(

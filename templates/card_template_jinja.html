@@ -13,6 +13,11 @@
                 <span>#??</span>
                 {% endif %}
             </div>
+            {% if 'new' in card_data %}
+            <span id="new_tag"
+                  class="position-absolute top-0 start-100 translate-middle badge p-1 text-bg-danger"><span
+                    class="visually-hidden">New</span></span>
+            {% endif %}
         </div>
         {% if card_data and 'own_count' in card_data and card_data['own_count'] %}
         <div class="card-body">
