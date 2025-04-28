@@ -408,8 +408,12 @@ class TestIconCollector(TestDBGetterBase):
                 0
             ].get(common_objects.ID_COLUMN)
             for i in range(10):
-                print(card_increment_data)
-                db_getter_connection.set_have(card_increment_data)
+                test_card = card_increment_data.copy()
+                db_getter_connection.set_have(test_card)
+                if i == 0:
+                    assert test_card["new"]
+                else:
+                    assert not test_card.get("new")
                 base_set_card_list = db_getter_connection.get_all_set_card_data(
                     set_request
                 )
@@ -417,9 +421,9 @@ class TestIconCollector(TestDBGetterBase):
                 assert first_card[common_objects.OWN_COUNT_COLUMN] == (i + 1)
                 assert (
                     first_card[common_objects.ID_COLUMN]
-                    == card_increment_data[common_objects.CARD_ID_COLUMN]
+                    == test_card[common_objects.CARD_ID_COLUMN]
                 )
-                assert card_increment_data[common_objects.OWN_COUNT_COLUMN] == (i + 1)
+                assert test_card[common_objects.OWN_COUNT_COLUMN] == (i + 1)
 
     def test_query_base_set_user_collection_half(self):
         set_name = "Base Set (Shadowless)"

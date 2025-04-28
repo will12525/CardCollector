@@ -188,7 +188,7 @@ class DatabaseHandler(DBConnection):
             params,
         )
         # If an existing row doesn't exist, add a new row
-        if not affected_row:
+        if affected_row is None:
             self.add_data_to_db(
                 f"INSERT INTO {common_objects.USER_COLLECTION_TABLE} ({common_objects.USER_ID_COLUMN}, {common_objects.CARD_ID_COLUMN}, {common_objects.OWN_COUNT_COLUMN}) VALUES (:{common_objects.USER_ID_COLUMN}, :{common_objects.CARD_ID_COLUMN}, 1);",
                 params,
