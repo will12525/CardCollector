@@ -170,6 +170,7 @@ def index():
 @login_required
 def get_set_card_list_html():
     meta_data = {}
+    print("----------------------get_set_card_list_html----------------------")
     if json_request := request.get_json():
         with DatabaseHandler() as db_getter_connection:
             print(json_request)
@@ -382,7 +383,7 @@ def generate_pack():
             meta_data=data,
         )
     else:
-        return f"Please wait: {wait_time}", 200
+        return jsonify({"remaining_time": wait_time}), 200
 
 
 @app.route(APIEndpoints.UPDATE_HAVE.value, methods=["POST"])

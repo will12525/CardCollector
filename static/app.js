@@ -216,27 +216,85 @@ async function loadDeck(action_id=1, deck_id=null, deck_name="") {
     let data = {"action_id": action_id, "deck_id": parseInt(deck_id, 10), "deck_name": deck_name};
     queryDeckBuilder(data)
 }
+
+
+// Parse ISO8601 duration (e.g., "0H:59M:30S") into total seconds
+function parseISODuration(duration) {
+    const match = duration.match(/(\d+)H:(\d+)M:(\d+)S/);
+    if (match) {
+        const hours = parseInt(match[1], 10);
+        const minutes = parseInt(match[2], 10);
+        const seconds = parseInt(match[3], 10);
+        return hours * 3600 + minutes * 60 + seconds;
+    }
+    return 0;
+}
+let isCountdownRunning = false; // Flag to track if the countdown is running
+
+function startCountdown(button, totalSeconds) {
+    if (isCountdownRunning) return; // Prevent multiple timers
+    isCountdownRunning = true;
+
+    const endTime = Date.now() + totalSeconds * 1000;
+
+    function updateTimer() {
+        const now = Date.now();
+        const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
+
+        const hours = Math.floor(remaining / 3600);
+        const minutes = Math.floor((remaining % 3600) / 60);
+        const seconds = remaining % 60;
+
+        button.innerHTML = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+        if (remaining > 0) {
+            setTimeout(updateTimer, 1000);
+        } else {
+            button.innerHTML = "Open Pack";
+            isCountdownRunning = false; // Reset the flag when the countdown ends
+        }
+    }
+
+    updateTimer();
+}
+
 async function generatePack(data) {
     const url = "/generate_pack";
     const dynamicContent = document.getElementById("card_container");
-    rainbow_loading_bar = document.getElementById("rainbow_loading_bar")
-    rainbow_loading_bar.hidden = false
     const gifImage = document.createElement('img');
     gifImage.src = '/static/pack_opening.gif';
     dynamicContent.innerHTML = ""
     dynamicContent.appendChild(gifImage);
-    await new Promise(resolve => setTimeout(resolve, 2000));
 
     let response = await fetch(url, {
         "method": "POST",
         "headers": {"Content-Type": "application/json"},
         "body": JSON.stringify(data),
-    }).then(response => response.text())
-        .then(htmlContent => {
-            const dynamicContent = document.getElementById("card_container");
-            dynamicContent.innerHTML = htmlContent;
-        }).catch(error => console.error(error));
-    rainbow_loading_bar.hidden = true
+    }).then(response => {
+        const contentType = response.headers.get("Content-Type");
+        if (contentType && contentType.includes("application/json")) {
+            return response.json(); // Parse JSON if the response is JSON
+        } else if (contentType && contentType.includes("text/html")) {
+            return response.text(); // Parse text if the response is HTML
+        } else {
+            throw new Error("Unsupported content type: " + contentType);
+        }
+    }).then(content => {
+        if (typeof content === "object") {
+            // Handle JSON content
+            console.log("JSON response:", content);
+            const generate_pack_button = document.getElementById("generate_pack_button");
+            const remainingTime = content["remaining_time"]; // ISO8601 duration format
+            const totalSeconds = parseISODuration(remainingTime);
+            startCountdown(generate_pack_button, totalSeconds);
+
+//            generate_pack_button.innerHTML = content["remaining_time"];
+            dynamicContent.innerHTML = "Please wait: " + remainingTime;
+        } else {
+            setTimeout(() => {dynamicContent.innerHTML = content;}, 2000);
+        }
+    }).catch(error => {
+        console.error("Error processing response:", error);
+    });
 }
 
 async function applySortFilter(filter_str) {
