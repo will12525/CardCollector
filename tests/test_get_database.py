@@ -64,6 +64,52 @@ class TestDBGetterBase(TestCase):
         with DatabaseHandler() as db_getter:
             db_getter.reset_have_want()
             db_getter.reset_users()
+            db_getter.reset_decks()
+
+
+class TestDeckBuilder(TestDBGetterBase):
+    def test_create_deck(self):
+        self.reset_db()
+        self.populate_db()
+        db_request_willow = {
+            common_objects.USER_NAME_COLUMN: "Willow",
+            common_objects.USER_PASS_COLUMN: "12345",
+        }
+        deck_list = [
+            1,
+            2,
+            3,
+        ]
+
+        with DatabaseHandler(common_objects.DBType.PHYSICAL) as db_getter_connection:
+            assert db_getter_connection.add_user(db_request_willow)
+            user_id = db_getter_connection.get_user_id(db_request_willow)
+            print(user_id)
+            # assert user_id == 1
+            create_deck_params = {
+                common_objects.USER_ID_COLUMN: user_id,
+                "deck_name": "Test Deck",
+                "card_list": deck_list,
+            }
+            deck_id = db_getter_connection.create_deck(create_deck_params)
+            print(
+                json.dumps(
+                    db_getter_connection.get_user_decks(create_deck_params), indent=4
+                )
+            )
+
+            deck_card_query = {
+                common_objects.USER_ID_COLUMN: user_id,
+                "deck_id": deck_id,
+            }
+            deck_card_list = db_getter_connection.get_deck_cards(deck_card_query)
+            assert len(deck_card_list) == 3
+            print(json.dumps(deck_card_list, indent=4))
+            for card_info in deck_card_list:
+                assert card_info[common_objects.ID_COLUMN] in deck_list
+
+            deck_stats = db_getter_connection.get_deck_stats(deck_card_query)
+            print(json.dumps(deck_stats, indent=4))
 
 
 class TestUserHandling(TestDBGetterBase):

@@ -14,16 +14,22 @@ TCGP_ID_COLUMN = "tcgp_id"
 TCGP_PATH_COLUMN = "tcgp_path"
 SET_ID_COLUMN = "set_id"
 CARD_CLASS_COLUMN = "card_class"
+CARD_ATTACK_COLUMN = "attack_info"
+CARD_ENERGY_COST_COLUMN = "energy_cost"
+CARD_TEXT_COLUMN = "card_text"
 
 SET_INFO_TABLE = "set_info"
 SET_NAME_COLUMN = "set_name"
 SET_INDEX_COLUMN = "set_index"
 SET_CARD_COUNT_COLUMN = "set_card_count"
 
+USER_STATS_TABLE = "user_stats"
 USER_INFO_TABLE = "user_info"
 USER_NAME_COLUMN = "user_name"
 USER_PASS_COLUMN = "user_pass_hash"
 LAST_PACK_OPEN_TIME_COLUMN = "last_pack_open_time"
+LAST_SET_NAME_COLUMN = "last_set_name"
+LAST_DECK_ID_COLUMN = "last_deck_id"
 
 
 USER_COLLECTION_TABLE = "user_collection"
@@ -49,6 +55,23 @@ default_card_dict = {
     TCGP_PATH_COLUMN: "",
     CARD_CLASS_COLUMN: "",
 }
+
+
+class DeckBuilderActions(Enum):
+    LOAD_DECK = auto()
+    ADD_CARD = auto()
+    REMOVE_CARD = auto()
+    UPDATE_DECK = auto()
+
+
+class DeckBuilderCardTypes(Enum):
+    POKEMON = auto()
+    TRAINER = auto()
+    ENERGY = auto()
+    SPECIAL_ENERGY = auto()
+    ITEM = auto()
+    SUPPORTER = auto()
+    STADIUM = auto()
 
 
 class CardInfo:

@@ -91,9 +91,11 @@ class DatabaseHandler(DBConnection):
 
         if where_clauses:
             where_clause = "WHERE " + " AND ".join(where_clauses)
-
+        ID_MOD = f"""
+            {common_objects.USER_COLLECTION_TABLE}.{common_objects.ID_COLUMN} AS user_collection_id
+            """
         ret_data["set_card_list"] = self.get_data_from_db(
-            f"SELECT * {self.BASE_QUERY} {where_clause} {sort_order};",
+            f"SELECT *, {ID_MOD} {self.BASE_QUERY} {where_clause} {sort_order};",
             params,
         )
         ret_data.update(
@@ -109,6 +111,8 @@ class DatabaseHandler(DBConnection):
                 ret_data["percent_complete"] = round(
                     (ret_data["count_have"] / ret_data["count_cards"]) * 100
                 )
+            else:
+                ret_data["percent_complete"] = 0
         return ret_data
 
     def get_sets(self):
@@ -136,6 +140,12 @@ class DatabaseHandler(DBConnection):
             params,
         )
 
+    def get_card_info(self, card_id):
+        return self.get_data_from_db_first_result(
+            f"SELECT * FROM {common_objects.CARD_INFO_TABLE} WHERE {common_objects.ID_COLUMN}=:{common_objects.CARD_ID_COLUMN};",
+            {common_objects.CARD_ID_COLUMN: card_id},
+        )
+
     def get_all_ids(self):
         return self.get_data_from_db(
             f"SELECT {common_objects.TCGP_ID_COLUMN} FROM {common_objects.CARD_INFO_TABLE};"
@@ -146,34 +156,6 @@ class DatabaseHandler(DBConnection):
             f"SELECT {common_objects.TCGP_ID_COLUMN} FROM {common_objects.CARD_INFO_TABLE} WHERE {common_objects.SET_ID_COLUMN}=:{common_objects.SET_ID_COLUMN} AND {common_objects.CARD_INDEX_COLUMN}=:{common_objects.CARD_INDEX_COLUMN};",
             params,
         )
-
-    def increase_want(self, params):
-        pass
-        # return self.get_data_from_db(
-        #     f"UPDATE {common_objects.CARD_INFO_TABLE} SET {common_objects.STATE_WANT_COLUMN} = {common_objects.STATE_WANT_COLUMN} + 1 WHERE {common_objects.TCGP_ID_COLUMN}=:{common_objects.TCGP_ID_COLUMN};",
-        #     params,
-        # )
-
-    def decrease_want(self, params):
-        pass
-        # return self.get_data_from_db(
-        #     f"UPDATE {common_objects.CARD_INFO_TABLE} SET {common_objects.STATE_WANT_COLUMN} = {common_objects.STATE_WANT_COLUMN} - 1 WHERE {common_objects.TCGP_ID_COLUMN}=:{common_objects.TCGP_ID_COLUMN};",
-        #     params,
-        # )
-
-    def increase_have(self, params):
-        pass
-        # return self.get_data_from_db(
-        #     f"UPDATE {common_objects.CARD_INFO_TABLE} SET {common_objects.STATE_HAVE_COLUMN} = {common_objects.STATE_HAVE_COLUMN} + 1 WHERE {common_objects.TCGP_ID_COLUMN}=:{common_objects.TCGP_ID_COLUMN};",
-        #     params,
-        # )
-
-    def decrease_have(self, params):
-        pass
-        # return self.get_data_from_db(
-        #     f"UPDATE {common_objects.CARD_INFO_TABLE} SET {common_objects.STATE_HAVE_COLUMN} = {common_objects.STATE_HAVE_COLUMN} - 1 WHERE {common_objects.TCGP_ID_COLUMN}=:{common_objects.TCGP_ID_COLUMN};",
-        #     params,
-        # )
 
     def gifted(self, params):
         return self.get_data_from_db(
@@ -215,6 +197,10 @@ class DatabaseHandler(DBConnection):
 
     def reset_users(self):
         return self.get_data_from_db(f"DELETE FROM {common_objects.USER_INFO_TABLE};")
+
+    def reset_decks(self):
+        self.get_data_from_db(f"DELETE FROM deck_cards;")
+        self.get_data_from_db(f"DELETE FROM deck_info;")
 
     def set_card_index(self, params):
         return self.get_data_from_db(
@@ -272,3 +258,148 @@ class DatabaseHandler(DBConnection):
             f"SELECT {common_objects.LAST_PACK_OPEN_TIME_COLUMN} FROM {common_objects.USER_INFO_TABLE} WHERE {common_objects.USER_NAME_COLUMN} = :{common_objects.USER_NAME_COLUMN} AND {common_objects.ID_COLUMN}=:{common_objects.USER_ID_COLUMN};",
             params,
         )
+
+    def set_user_last_set(self, params):
+        return self.add_data_to_db(
+            f"UPDATE {common_objects.USER_INFO_TABLE} SET {common_objects.LAST_SET_NAME_COLUMN} = :{common_objects.SET_NAME_COLUMN} WHERE {common_objects.USER_NAME_COLUMN}=:{common_objects.USER_NAME_COLUMN} AND {common_objects.ID_COLUMN}=:{common_objects.USER_ID_COLUMN};",
+            params,
+        )
+
+    def add_card_to_deck(self, user_id, deck_id, card_id):
+        """
+        Adds a card to the deck. If the card already exists, increments its count.
+        """
+        query = f"""
+            INSERT INTO deck_cards (deck_id, {common_objects.CARD_ID_COLUMN}, card_count)
+            SELECT :deck_id, :{common_objects.CARD_ID_COLUMN}, 1
+            WHERE EXISTS (
+                SELECT 1 FROM deck_info
+                WHERE deck_info.id = :deck_id AND deck_info.{common_objects.USER_ID_COLUMN} = :user_id
+            )
+            ON CONFLICT(deck_id, {common_objects.CARD_ID_COLUMN})
+            DO UPDATE SET card_count = card_count + 1
+            WHERE EXISTS (
+                SELECT 1 FROM deck_info
+                WHERE deck_info.id = :deck_id AND deck_info.{common_objects.USER_ID_COLUMN} = :user_id
+            );
+        """
+        self.add_data_to_db(
+            query,
+            {
+                common_objects.USER_ID_COLUMN: user_id,
+                "deck_id": deck_id,
+                common_objects.CARD_ID_COLUMN: card_id,
+            },
+        )
+
+    def remove_card_from_deck(self, card_id, deck_id):
+        """
+        Removes a card from the deck by decrementing its count. If the count reaches 0, the card is removed from the deck.
+        """
+        params = {
+            common_objects.CARD_ID_COLUMN: card_id,
+            "deck_id": deck_id,
+        }
+        # Then, delete the row if card_count is 1
+        delete_query = """
+            DELETE FROM deck_cards
+            WHERE card_id = :card_id AND deck_id = :deck_id AND card_count = 1;
+        """
+        self.add_data_to_db(
+            delete_query,
+            params,
+        )
+
+        # First, decrement the card_count if it's greater than 1
+        update_query = """
+            UPDATE deck_cards
+            SET card_count = card_count - 1
+            WHERE card_id = :card_id AND deck_id = :deck_id AND card_count > 1;
+        """
+        self.add_data_to_db(update_query, params)
+
+    def create_deck(self, user_id, deck_name, card_list):
+        deck_id = self.add_data_to_db(
+            f"INSERT INTO deck_info ({common_objects.USER_ID_COLUMN}, deck_name) VALUES (:{common_objects.USER_ID_COLUMN}, :deck_name);",
+            {"deck_name": deck_name, "user_id": user_id},
+        )
+        print(f"New Deck ID: {deck_id}, Deck Name: {deck_name}")
+        for card_id in card_list:
+            self.add_card_to_deck(user_id, deck_id, card_id)
+        return deck_id
+
+    def update_deck(self, deck_name, deck_id, user_id):
+        self.add_data_to_db(
+            f"UPDATE deck_info SET deck_name = :deck_name WHERE {common_objects.USER_ID_COLUMN}=:{common_objects.USER_ID_COLUMN} AND id=:deck_id;",
+            {"deck_name": deck_name, "deck_id": deck_id, "user_id": user_id},
+        )
+
+    def get_user_decks(self, user_id):
+        return self.get_data_from_db(
+            f"SELECT * FROM deck_info WHERE {common_objects.USER_ID_COLUMN} = :{common_objects.USER_ID_COLUMN};",
+            {"user_id": user_id},
+        )
+
+    def get_deck_cards(self, deck_id, user_id):
+        return self.get_data_from_db(
+            """
+                SELECT card_info.*, deck_cards.card_count
+                FROM deck_cards
+                JOIN deck_info ON deck_cards.deck_id = deck_info.id
+                JOIN card_info ON deck_cards.card_id = card_info.id
+                WHERE deck_info.user_id = :user_id AND deck_info.id = :deck_id;
+            """,
+            {"deck_id": deck_id, "user_id": user_id},
+        )
+
+    def get_deck_cards_card_count(self, deck_id, card_id):
+        GET_DECK_CARD_COUNT = "SELECT card_count FROM deck_cards WHERE deck_id = :deck_id AND card_id = :card_id;"
+        return self.get_row_item(
+            GET_DECK_CARD_COUNT, {"deck_id": deck_id, "card_id": card_id}, "card_count"
+        )
+
+    def get_deck_card_stat(self, card_column, deck_id):
+        return self.get_data_from_db(
+            f"""
+                    SELECT
+                    card_info.{card_column},
+                    SUM(deck_cards.card_count) AS card_count
+                    FROM deck_cards
+                    JOIN card_info ON deck_cards.card_id = card_info.id
+                    WHERE deck_cards.deck_id = :deck_id
+                    GROUP BY card_info.{card_column};
+                """,
+            {"deck_id": deck_id},
+        )
+
+    def get_deck_card_count(self, deck_id):
+        return self.get_row_item(
+            f"""
+                    SELECT
+                    SUM(deck_cards.card_count) AS card_count
+                    FROM deck_cards
+                    JOIN card_info ON deck_cards.card_id = card_info.id
+                    WHERE deck_cards.deck_id = :deck_id;
+                """,
+            {"deck_id": deck_id},
+            "card_count",
+        )
+
+    def get_deck_info(self, deck_id, user_id):
+        return self.get_data_from_db_first_result(
+            f"""
+                    SELECT * FROM deck_info WHERE id = :deck_id AND user_id = :user_id;
+                """,
+            {"deck_id": deck_id, "user_id": user_id},
+        )
+
+    def get_deck_stats(self, deck_id):
+        return {
+            "card_count": self.get_deck_card_count(deck_id),
+            "card_classes": self.get_deck_card_stat(
+                common_objects.CARD_CLASS_COLUMN, deck_id
+            ),
+            "card_types": self.get_deck_card_stat(
+                common_objects.CARD_TYPE_COLUMN, deck_id
+            ),
+        }

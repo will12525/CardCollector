@@ -21,6 +21,7 @@
                 <a class="navbar-brand" href="#">{{ username }}</a>
             </ul>
             <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a id=open_deck_builder_button class="nav-link" aria-current="page">Deck</a></li>
             </ul>
             <form action="/logout" method="post">
                 <button class="btn btn-outline-success" type="submit">Logout</button>
@@ -31,7 +32,7 @@
 <div id="mediaContentSelectDiv" class="main-content-container container-fluid">
     <div class="row">
         <div class="col-sm-2">
-            <div class="card sticky-top mb-3" style="background-color:Linen;">
+            <div class="card sticky-top mb-2" style="background-color:Linen;">
                 <div class="card-header">
                     Filters
                 </div>
@@ -139,6 +140,11 @@
         </div>
     </div>
 </div>
+<nav id="deck_navbar" class="navbar fixed-bottom bg-body-tertiary">
+    <div id="deck_container" class="container-fluid">
+
+    </div>
+</nav>
 <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='app.js') }}"></script>
 <script type="text/javascript" language="javascript"
         src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>

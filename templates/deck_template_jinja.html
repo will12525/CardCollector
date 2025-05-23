@@ -1,0 +1,37 @@
+<div class="dropup input-group mb-3">
+    <button type="button" id="new_deck_button" class="btn btn-outline-secondary">New</button>
+    <button type="button" id="deck_list_dropdown_button"
+            class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+            data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="visually-hidden">Toggle Dropdown</span>
+    </button>
+    <ul class="dropdown-menu" id="deck_list_dropdown">
+        {% for deck_metadata in meta_data['deck_name_list'] %}
+        <li>
+            <button class="dropdown-item" type="button"
+                    onclick="loadDeck(1, deck_id={{deck_metadata.get('id')}})">
+                {{deck_metadata.get("deck_name")}}
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+    <input type="text" id="deck_list_dropdown_selected_deck" class="form-control"
+           aria-label="Text input with segmented dropdown button"
+           data-collection-type="deck"
+           data-deck-id="{{ meta_data.get('deck_id', null) }}" value="{{ meta_data.get('deck_name') }}">
+
+</div>
+<div id="deck_scroll_container_card_list" class="scrollable-container">
+    <div class="scrollable-content">
+        {% if 'deck_card_list' in meta_data %}
+        {% for card_data in meta_data['deck_card_list'] %}
+        <div class="deck-image px-1">
+            <img class="img-fluid" loading="lazy" data-collection-type="deck"
+                 data-card-id="{{ card_data.get('id', null) }}"
+                 src="/static/card_images/{{ card_data['tcgp_id'] }}.jpg" onerror="apply_default_image(this)">
+            <span>{{ card_data.get('card_count', '') }}</span>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>

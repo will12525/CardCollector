@@ -68,13 +68,61 @@
 
 
 .main-content-container {
-    margin-bottom: 40%;
+    margin-bottom: 300px;
     margin-top: 5%;
 }
 
 .card-header {
     width: 100%;
     height: 10%;
+}
+
+.deck-metadata-col {
+  border: solid 1px tan;
+  text-align: center;
+}
+
+.scrollable-container {
+    width: 100%; /* Fills the width of the container */
+    height: auto; /* Set a fixed height for the container */
+    overflow-x: auto; /* Enables horizontal scrolling */
+    white-space: nowrap; /* Prevents wrapping of child elements */
+    background-color: #f8f9fa; /* Optional: Background color for better visibility */
+}
+
+.scrollable-content {
+    display: inline-flex; /* Ensures items are displayed in a row */
+    height: auto;
+    /*gap: 1rem; /* Optional: Adds spacing between items */
+}
+
+.deck-image {
+    flex: 0 0 auto; /* Prevents items from shrinking */
+    width: 150px; /* Fixed width for each image */
+    height: 100%; /* Fixed height for each image */
+    display: flex; /* Center content inside the image container */
+    flex-direction: column; /* Stack elements vertically */
+    /*justify-content: center;
+    align-items: center;*/
+    /*background-color: lightgray; /* Optional: Placeholder background color */
+}
+.deck-image img {
+    max-width: 100%;
+    height: auto;
+}
+
+.deck-image span {
+    font-size: 14px; /* Adjust font size */
+    text-align: center;
+}
+
+.collection-image {
+    display: flex; /* Center content inside the image container */
+    flex-direction: column; /* Stack elements vertically */
+}
+.collection-image span {
+    font-size: 14px; /* Adjust font size */
+    text-align: center;
 }
 
 

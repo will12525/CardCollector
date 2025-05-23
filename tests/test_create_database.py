@@ -61,12 +61,27 @@ class TestDBCreator(TestDBCreatorInit):
 
     def test_add_users(self):
         # pass
-        # self.erase_db()
+        self.erase_db()
         with DBCreator(common_objects.DBType.PHYSICAL) as db_setter_connection:
             db_setter_connection.create_db()
-            db_setter_connection.add_user({common_objects.USER_NAME_COLUMN: "Willow"})
-            db_setter_connection.add_user({common_objects.USER_NAME_COLUMN: "Tori"})
-            db_setter_connection.add_user({common_objects.USER_NAME_COLUMN: "Leonard"})
+            db_setter_connection.add_user(
+                {
+                    common_objects.USER_NAME_COLUMN: "Willow",
+                    common_objects.USER_PASS_COLUMN: "1234",
+                }
+            )
+            db_setter_connection.add_user(
+                {
+                    common_objects.USER_NAME_COLUMN: "Tori",
+                    common_objects.USER_PASS_COLUMN: "1234",
+                }
+            )
+            db_setter_connection.add_user(
+                {
+                    common_objects.USER_NAME_COLUMN: "Leonard",
+                    common_objects.USER_PASS_COLUMN: "1234",
+                }
+            )
 
     def test_custom_injection(self):
         card_machamp = {

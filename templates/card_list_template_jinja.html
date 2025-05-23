@@ -1,20 +1,17 @@
 <div class="col-md-12">
-    <div class="card mb-3" style="background-color:Linen;">
-        <div class="card-header">Data:
+    <div class="card mb-1" style="background-color:Linen;">
+        <div class="card-header">{{ meta_data.get("set_name", '') }}
             <span style="float: right;">You're doing a good job. You can take a break. I love you.</span>
         </div>
-        <div class="row g-0">
-            <div class="col-md-4">
-                <div class="card-body">
-                    <p class="card-text">Set Name: {{ meta_data.get("set_name", 'Missing set name') }}</p>
-                </div>
+        <div class="card-body row g-0">
+            <div class="col-2 deck-metadata-col">
+                <p class="card-text">Have: {{ meta_data["count_have"] }}</p>
             </div>
-            <div class="col-md-4">
-                <div class="card-body">
-                    <p class="card-text">Have Cards: {{ meta_data["count_have"] }}</p>
-                    <p class="card-text">Total Cards: {{ meta_data["count_cards"] }}</p>
-                    <p class="card-text">Complete: {{ meta_data["percent_complete"] }}%</p>
-                </div>
+            <div class="col-2 deck-metadata-col">
+                <p class="card-text">Total: {{ meta_data["count_cards"] }}</p>
+            </div>
+            <div class="col-3 deck-metadata-col">
+                <p class="card-text">Complete: {{ meta_data["percent_complete"] }}%</p>
             </div>
         </div>
     </div>

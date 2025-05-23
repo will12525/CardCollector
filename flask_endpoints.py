@@ -1,3 +1,4 @@
+import json
 import pathlib
 import os
 from enum import Enum
@@ -67,6 +68,7 @@ class APIEndpoints(Enum):
     MAIN = "/"
     GET_SET_CARD_LIST = "/get_set_card_list"
     GET_SET_CARD_LIST_HTML = "/get_set_card_list_html"
+    GET_DECK_DATA_HTML = "/get_deck_data_html"
     UPDATE_HAVE = "/update_have"
     UPDATE_WANT = "/update_want"
     GIFTED = "/gifted"
@@ -82,9 +84,8 @@ DB_PATH = database_handler.db_access.DBConnection.MEDIA_METADATA_DB_NAME
 
 # Create an empty DB
 def setup_db():
-    if not os.path.exists(DB_PATH):
-        with DBCreator(DBType.PHYSICAL) as db_connection:
-            db_connection.create_db()
+    with DBCreator(DBType.PHYSICAL) as db_connection:
+        db_connection.create_db()
 
 
 # Decorator to protect routes that require login
@@ -185,9 +186,122 @@ def get_set_card_list_html():
                     session.get("user_id"),
                 )
             )
-    print(meta_data)
+            db_request = {
+                "set_name": set_name,
+                "user_id": session.get("user_id"),
+                "user_name": session.get("username"),
+            }
+            db_getter_connection.set_user_last_set(db_request)
+
+    print(json.dumps(meta_data, indent=4))
     return render_template(
         "card_list_template_jinja.html",
+        meta_data=meta_data,
+    )
+
+
+def can_user_add_card_to_deck(db_getter_connection, user_id, deck_id, card_id):
+    print("----------------------can_user_add_card_to_deck----------------------")
+    # 4 unique cards per deck unless energy card
+    card_count = db_getter_connection.get_deck_cards_card_count(deck_id, card_id)
+    card_info = db_getter_connection.get_card_info(card_id)
+    deck_stats = db_getter_connection.get_deck_stats(deck_id)
+    print(card_info)
+    print(deck_stats)
+    print(card_count)
+    if (
+        card_count
+        and card_count >= 4
+        and card_info.get(common_objects.CARD_CLASS_COLUMN) != "energy"
+    ):
+        return False
+    elif deck_stats.get("card_count") and deck_stats.get("card_count") >= 60:
+        return False
+    return True
+
+
+@app.route(APIEndpoints.GET_DECK_DATA_HTML.value, methods=["POST"])
+@login_required
+def get_deck_data_html():
+    meta_data = {"user_id": session.get("user_id")}
+    print("----------------------get_deck_data_html----------------------")
+    if json_request := request.get_json():
+        action_id = json_request.get("action_id")
+        deck_name = json_request.get("deck_name")
+        deck_id = json_request.get("deck_id")
+        card_id = json_request.get("card_id")
+        card_list = json_request.get("card_list", [])
+        if deck_name:
+            deck_name = deck_name.strip()
+        meta_data["deck_id"] = deck_id
+
+        with DatabaseHandler() as db_getter_connection:
+            print(f"json_request: {json.dumps(json_request, indent=4)}")
+            if action_id == common_objects.DeckBuilderActions.UPDATE_DECK.value:
+                if deck_id:
+                    print("Updating Deck")
+                    db_getter_connection.update_deck(
+                        deck_name,
+                        deck_id,
+                        session.get("user_id"),
+                    )
+                    meta_data["deck_id"] = deck_id
+                else:
+                    print("Adding Deck")
+                    meta_data["deck_id"] = db_getter_connection.create_deck(
+                        session.get("user_id"),
+                        deck_name,
+                        card_list,
+                    )
+            elif (
+                action_id == common_objects.DeckBuilderActions.ADD_CARD.value
+            ) and can_user_add_card_to_deck(
+                db_getter_connection,
+                session.get("user_id"),
+                deck_id,
+                card_id,
+            ):
+                print("Adding Card")
+                db_getter_connection.add_card_to_deck(
+                    session.get("user_id"),
+                    deck_id,
+                    card_id,
+                )
+            elif action_id == common_objects.DeckBuilderActions.REMOVE_CARD.value:
+                print("Removing Card")
+                db_getter_connection.remove_card_from_deck(card_id, deck_id)
+            elif action_id == common_objects.DeckBuilderActions.LOAD_DECK.value:
+                pass
+            else:
+                print("Unknown action")
+                return jsonify({"error": "Unknown action"}), 400
+
+            meta_data["deck_name_list"] = db_getter_connection.get_user_decks(
+                session.get("user_id")
+            )
+            selected_deck_id = meta_data.get("deck_id")
+            if not selected_deck_id and len(meta_data["deck_name_list"]) > 0:
+                selected_deck_id = meta_data["deck_name_list"][0].get(
+                    common_objects.ID_COLUMN
+                )
+
+            if selected_deck_id:
+                meta_data["deck_id"] = selected_deck_id
+                meta_data.update(
+                    db_getter_connection.get_deck_info(
+                        meta_data["deck_id"], session.get("user_id")
+                    )
+                )
+                meta_data["deck_card_list"] = db_getter_connection.get_deck_cards(
+                    meta_data["deck_id"], session.get("user_id")
+                )
+                meta_data["deck_stats"] = db_getter_connection.get_deck_stats(
+                    meta_data["deck_id"]
+                )
+
+    print(f"meta_data: {json.dumps(meta_data.get("deck_card_list"), indent=4)}")
+    return render_template(
+        "deck_template_jinja.html",
         meta_data=meta_data,
     )
 
@@ -257,7 +371,6 @@ def generate_pack():
                 set_card_list = db_getter_connection.get_all_set_card_data(db_request)
                 pack = Pack(set_card_list)
                 data["set_card_list"] = pack.open()
-                data["set_list"] = db_getter_connection.get_sets()
                 # Update user collection with the new pack data
                 for card in data["set_card_list"]:
                     card[common_objects.CARD_ID_COLUMN] = card[common_objects.ID_COLUMN]

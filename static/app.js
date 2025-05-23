@@ -128,6 +128,94 @@ async function queryDB(data) {
         .catch(error => console.error(error));
     document.getElementById("rainbow_loading_bar").hidden = true
 }
+
+function handleImageClick(imgElement) {
+    const imageType = imgElement.getAttribute("data-collection-type");
+    // Perform actions with the imgElement
+    const deckInput = document.getElementById("deck_list_dropdown_selected_deck");
+    if (deckInput && !document.getElementById("deck_navbar").hidden) {
+        var deck_id = deckInput.getAttribute("data-deck-id");
+
+        if (imageType === "collection") {
+            let data = {"action_id": 2, "deck_id": parseInt(deck_id, 10), "card_id": parseInt(imgElement.getAttribute("data-card-id"), 10), "user-collection-id": parseInt(imgElement.getAttribute("data-user-collection-id"), 10), };
+            queryDeckBuilder(data)
+            // Handle collection-specific logic here
+        } else if (imageType === "deck") {
+            let data = {"action_id": 3, "deck_id": parseInt(deck_id, 10), "card_id": parseInt(imgElement.getAttribute("data-card-id"), 10), };
+            queryDeckBuilder(data)
+            // Handle deck-specific logic here
+        } else {
+            console.log("Unknown image type:", imgElement);
+        }
+    }
+}
+
+function clearDeckContainer() {
+    const deckInput = document.getElementById("deck_list_dropdown_selected_deck");
+    const deck_scroll_container_card_list = document.getElementById("deck_scroll_container_card_list");
+    if (deck_scroll_container_card_list) {
+        deck_scroll_container_card_list.innerHTML = "";
+    }
+    if (deckInput) {
+        deckInput.value = "";
+        deckInput.setAttribute("data-deck-id", "");
+    }
+}
+
+async function queryDeckBuilder(data) {
+    const url = "/get_deck_data_html";
+    console.log(data)
+    let response = await fetch(url, {
+        "method": "POST",
+        "headers": {"Content-Type": "application/json"},
+        "body": JSON.stringify(data),
+    }).then(response => {
+        const contentType = response.headers.get("Content-Type");
+        if (contentType && contentType.includes("application/json")) {
+            return response.json(); // Parse JSON if the response is JSON
+        } else if (contentType && contentType.includes("text/html")) {
+            return response.text(); // Parse text if the response is HTML
+        } else {
+            throw new Error("Unsupported content type: " + contentType);
+        }
+    }).then(content => {
+        if (typeof content === "object") {
+            // Handle JSON content
+            console.log("JSON response:", content);
+        } else {
+            const dynamicContent = document.getElementById("deck_container");
+            dynamicContent.innerHTML = content;
+            const deckInput = document.getElementById("deck_list_dropdown_selected_deck");
+            const new_deck_button = document.getElementById("new_deck_button");
+            if (new_deck_button) {
+                new_deck_button.addEventListener("click", function() {
+                    clearDeckContainer()
+                });
+            }
+            if (deckInput) {
+                // User presses "Enter"
+                deckInput.addEventListener("keydown", function(e) {
+                    if (e.key === "Enter") {
+                        const deckId = deckInput.getAttribute("data-deck-id");
+                        loadDeck(4, deckId, deckInput.value);
+                    }
+                });
+                // input loses focus
+                deckInput.addEventListener("blur", function() {
+                    const deckId = deckInput.getAttribute("data-deck-id");
+                    loadDeck(4, deckId, deckInput.value);
+                });
+            }
+            document.getElementById("deck_navbar").hidden = false
+        }}).catch(error => {
+            console.error("Error processing response:", error);
+        });
+}
+
+async function loadDeck(action_id=1, deck_id=null, deck_name="") {
+    let data = {"action_id": action_id, "deck_id": parseInt(deck_id, 10), "deck_name": deck_name};
+    queryDeckBuilder(data)
+}
 async function generatePack(data) {
     const url = "/generate_pack";
     const dynamicContent = document.getElementById("card_container");
@@ -217,6 +305,27 @@ document.addEventListener("DOMContentLoaded", function(event){
         "card_name_search_query": "",
         "filter_ownership": ""
     };
+
+    var open_deck_builder_button = document.getElementById("open_deck_builder_button");
+    if (open_deck_builder_button !== null)
+    {
+        open_deck_builder_button.addEventListener("click", function(e) {
+            let deck_navbar = document.getElementById("deck_navbar")
+            if (deck_navbar.hidden) {
+                loadDeck();
+            } else {
+                deck_navbar.hidden = true
+            }
+        });
+    }
+
+    document.addEventListener("click", function(event) {
+        if (event.target.tagName === "IMG") {
+            handleImageClick(event.target);
+        }
+    });
+//    loadDeck();
+
     console.log(data)
     queryDB(data)
 });

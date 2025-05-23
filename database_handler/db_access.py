@@ -29,16 +29,14 @@ def get_data_list(cursor) -> list[dict]:
 
 
 class DBConnection:
-    VERSION = 1
+    VERSION = 2
     MEDIA_METADATA_DB_NAME = "pokemon_card_data.db"
 
     __sql_create_version_info_table = f"""CREATE TABLE IF NOT EXISTS version_info (
                                          {common_objects.ID_COLUMN} integer PRIMARY KEY,
                                          version integer NOT NULL
                                       );"""
-    __version_table_creation_script = "".join(
-        ["BEGIN;", __sql_create_version_info_table, "COMMIT;"]
-    )
+    __version_table_creation_script = [__sql_create_version_info_table]
     __sql_insert_version_info_table = (
         "INSERT INTO version_info(version) VALUES(:version_info);"
     )
@@ -89,17 +87,18 @@ class DBConnection:
                     print_db_traceback(error, f"Error: Query: {query} Params: {params}")
                     return []
 
-    def create_tables(self, db_table_creation_script):
-        if sqlite3.complete_statement(db_table_creation_script):
+    def execute_db_script(self, db_script_lines: list):
+        db_script_lines.insert(0, "BEGIN;")
+        db_script_lines.append("COMMIT;")
+        db_script = "".join(db_script_lines)
+        if sqlite3.complete_statement(db_script):
             with closing(self.connection.cursor()) as cursor:
                 try:
-                    cursor.executescript(db_table_creation_script)
+                    cursor.executescript(db_script)
                     self.connection.commit()
                     return get_last_row_id(cursor)
                 except sqlite3.Error as error:
-                    print_db_traceback(
-                        error, f"Error creating tables:\n{db_table_creation_script}"
-                    )
+                    print_db_traceback(error, f"Error creating tables:\n{db_script}")
 
     def add_data_to_db(self, query, params):
         return self.execute_db_query(query, get_last_row_id, params)
@@ -120,7 +119,7 @@ class DBConnection:
 
     def check_db_version(self):
         if not (version := self.get_row_item(self.__version_info_query, (), "version")):
-            self.create_tables(self.__version_table_creation_script)
+            self.execute_db_script(self.__version_table_creation_script)
             self.add_data_to_db(
                 self.__sql_insert_version_info_table, {"version_info": self.VERSION}
             )
