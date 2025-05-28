@@ -244,19 +244,21 @@ class DatabaseHandler(DBConnection):
             params,
         )
 
-    def set_user_pack_time(self, params):
-        now = datetime.datetime.now(datetime.UTC)
-        iso_string = now.isoformat()
-        params[common_objects.LAST_PACK_OPEN_TIME_COLUMN] = iso_string
+    def set_user_pack_time(self, username, user_id):
         return self.add_data_to_db(
-            f"UPDATE {common_objects.USER_INFO_TABLE} SET {common_objects.LAST_PACK_OPEN_TIME_COLUMN} = :{common_objects.LAST_PACK_OPEN_TIME_COLUMN} WHERE {common_objects.USER_NAME_COLUMN}=:{common_objects.USER_NAME_COLUMN} AND {common_objects.ID_COLUMN}=:{common_objects.USER_ID_COLUMN};",
-            params,
+            f"UPDATE user_info SET last_pack_open_time = :last_pack_open_time WHERE user_name=:user_name AND id=:id;",
+            {
+                "id": user_id,
+                "user_name": username,
+                "last_pack_open_time": datetime.datetime.now(datetime.UTC).isoformat(),
+            },
         )
 
-    def get_user_pack_time(self, params):
-        return self.get_data_from_db_first_result(
-            f"SELECT {common_objects.LAST_PACK_OPEN_TIME_COLUMN} FROM {common_objects.USER_INFO_TABLE} WHERE {common_objects.USER_NAME_COLUMN} = :{common_objects.USER_NAME_COLUMN} AND {common_objects.ID_COLUMN}=:{common_objects.USER_ID_COLUMN};",
-            params,
+    def get_user_pack_time(self, username, user_id):
+        return self.get_row_item(
+            f"SELECT last_pack_open_time FROM user_info WHERE user_name = :user_name AND id=:id;",
+            {"id": user_id, "user_name": username},
+            "last_pack_open_time",
         )
 
     def set_user_last_set(self, params):

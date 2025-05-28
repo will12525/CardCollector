@@ -188,16 +188,16 @@ class TestUserHandling(TestDBGetterBase):
         # self.reset_db()
         self.erase_db()
         self.populate_db()
+        username = "Willow"
+        password = "12345"
         db_request_willow = {
             common_objects.USER_NAME_COLUMN: "Willow",
             common_objects.USER_PASS_COLUMN: "12345",
         }
 
         with DatabaseHandler(common_objects.DBType.PHYSICAL) as db_getter_connection:
-            db_request_willow[common_objects.ID_COLUMN] = db_getter_connection.add_user(
-                db_request_willow
-            )
-            db_getter_connection.set_user_pack_time(db_request_willow)
+            user_id = db_getter_connection.add_user(db_request_willow)
+            db_getter_connection.set_user_pack_time(username, user_id)
 
 
 class TestPackGenerator(TestDBGetterBase):

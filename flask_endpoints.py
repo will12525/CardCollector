@@ -73,7 +73,6 @@ class APIEndpoints(Enum):
     UPDATE_WANT = "/update_want"
     GIFTED = "/gifted"
     UPDATE_CARD_INDEX = "/update_card_index"
-    GENERATE_PACK = "/generate_pack"
     REGISTER = "/new_user"
     LOGIN = "/login"
     LOGOUT = "/logout"
@@ -161,6 +160,11 @@ def index():
         python_metadata = {
             "set_list": db_getter_connection.get_sets(),
         }
+        iso_string = db_getter_connection.get_user_pack_time(
+            session.get("username"), session.get("user_id")
+        )
+        (can_user, next_allowed_time) = can_user_open_pack(iso_string)
+        python_metadata["next_allowed_time"] = next_allowed_time
     return render_template(
         "index.html", username=session.get("username"), python_metadata=python_metadata
     )
@@ -326,36 +330,30 @@ def get_set_card_list():
     return jsonify(data), 200
 
 
-def can_user_open_pack(db_getter_connection, db_request):
-    iso_string = db_getter_connection.get_user_pack_time(db_request).get(
-        common_objects.LAST_PACK_OPEN_TIME_COLUMN
-    )
+def can_user_open_pack(iso_string):
     if not iso_string:
-        return True, None
+        return True, None  # No previous action, user can proceed
+
     last_open_time = datetime.datetime.fromisoformat(
         iso_string.replace("Z", "+00:00")
-    )  # Handle UTC and other timezone strings
+    )  # Convert ISO string to datetime
     current_time = datetime.datetime.now(datetime.UTC)
 
-    time_difference = current_time - last_open_time
+    # Calculate the next allowed time (1 hour after the last action)
+    next_allowed_time = last_open_time + datetime.timedelta(hours=1)
 
-    if time_difference >= datetime.timedelta(hours=1):
-        return True, None
+    if current_time >= next_allowed_time:
+        return True, None  # User can proceed
     else:
-        remaining_time = datetime.timedelta(hours=1) - time_difference
-        hours, remainder = divmod(remaining_time.total_seconds(), 3600)
-        minutes, seconds = divmod(remainder, 60)
-        iso_duration = (
-            f"{int(hours)}H:{int(minutes)}M:{int(seconds)}S"  # ISO8601 duration format
-        )
-        return False, iso_duration
+        # Return the next allowed time as a timestamp (milliseconds since epoch)
+        return False, int(next_allowed_time.timestamp() * 1000)
 
 
-@app.route(APIEndpoints.GENERATE_PACK.value, methods=["POST"])
+@app.route("/generate_pack", methods=["POST"])
 @login_required
 def generate_pack():
     data = {}
-    wait_time = ""
+    next_allowed_time = None
 
     if json_request := request.get_json():
         db_request = {
@@ -366,9 +364,14 @@ def generate_pack():
 
         print(f"generate_pack: {json_request}")
         with DatabaseHandler() as db_getter_connection:
-            (can_user, wait_time) = can_user_open_pack(db_getter_connection, db_request)
+            iso_string = db_getter_connection.get_user_pack_time(
+                session.get("username"), session.get("user_id")
+            )
+            (can_user, next_allowed_time) = can_user_open_pack(iso_string)
             if can_user:
-                db_getter_connection.set_user_pack_time(db_request)
+                db_getter_connection.set_user_pack_time(
+                    session.get("username"), session.get("user_id")
+                )
                 set_card_list = db_getter_connection.get_all_set_card_data(db_request)
                 pack = Pack(set_card_list)
                 data["set_card_list"] = pack.open()
@@ -383,7 +386,7 @@ def generate_pack():
             meta_data=data,
         )
     else:
-        return jsonify({"remaining_time": wait_time}), 200
+        return jsonify({"next_allowed_time": next_allowed_time}), 200
 
 
 @app.route(APIEndpoints.UPDATE_HAVE.value, methods=["POST"])

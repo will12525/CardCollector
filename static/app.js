@@ -230,14 +230,13 @@ function parseISODuration(duration) {
     return 0;
 }
 let isCountdownRunning = false; // Flag to track if the countdown is running
-
-function startCountdown(button, totalSeconds) {
+function startCountdown() {
     if (isCountdownRunning) return; // Prevent multiple timers
     isCountdownRunning = true;
 
-    const endTime = Date.now() + totalSeconds * 1000;
-
+    const button = document.getElementById("generate_pack_button");
     function updateTimer() {
+        const endTime = parseInt(button.getAttribute("data-end-time"), 10); // Retrieve end time
         const now = Date.now();
         const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
 
@@ -257,15 +256,22 @@ function startCountdown(button, totalSeconds) {
     updateTimer();
 }
 
-async function generatePack(data) {
-    const url = "/generate_pack";
-    const dynamicContent = document.getElementById("card_container");
-    const gifImage = document.createElement('img');
-    gifImage.src = '/static/pack_opening.gif';
-    dynamicContent.innerHTML = ""
-    dynamicContent.appendChild(gifImage);
+async function applySortFilter(filter_str) {
+    let data = {
+        "set_name": document.getElementById("primary_card_set_title").innerText,
+        "filter_str": filter_str,
+        "card_name_search_query": document.getElementById("card_name_search_query_text_field").value,
+        "filter_ownership": document.getElementById("filter_ownership").textContent
+    };
+    queryDB(data)
+    updateSpanText("sort_by_selected_item", filter_str)
+}
+async function generatePackButton() {
+    let data = {
+        "set_name": document.getElementById("primary_card_set_title").innerText,
+    };
 
-    let response = await fetch(url, {
+    let response = await fetch("/generate_pack", {
         "method": "POST",
         "headers": {"Content-Type": "application/json"},
         "body": JSON.stringify(data),
@@ -282,51 +288,22 @@ async function generatePack(data) {
         if (typeof content === "object") {
             // Handle JSON content
             console.log("JSON response:", content);
-            const generate_pack_button = document.getElementById("generate_pack_button");
-            const remainingTime = content["remaining_time"]; // ISO8601 duration format
-            const totalSeconds = parseISODuration(remainingTime);
-            startCountdown(generate_pack_button, totalSeconds);
-
-//            generate_pack_button.innerHTML = content["remaining_time"];
-            dynamicContent.innerHTML = "Please wait: " + remainingTime;
+            const button = document.getElementById("generate_pack_button");
+            button.setAttribute("data-end-time", content["next_allowed_time"]); // Store end time in a data attribute
+            startCountdown();
         } else {
+            const gifImage = document.createElement('img');
+            gifImage.src = '/static/pack_opening.gif';
+            const dynamicContent = document.getElementById("card_container");
+            dynamicContent.innerHTML = ""
+            dynamicContent.appendChild(gifImage);
             setTimeout(() => {dynamicContent.innerHTML = content;}, 2000);
         }
     }).catch(error => {
         console.error("Error processing response:", error);
     });
 }
-
-async function applySortFilter(filter_str) {
-    let data = {
-        "set_name": document.getElementById("primary_card_set_title").innerText,
-        "filter_str": filter_str,
-        "card_name_search_query": document.getElementById("card_name_search_query_text_field").value,
-        "filter_ownership": document.getElementById("filter_ownership").textContent
-    };
-    queryDB(data)
-    updateSpanText("sort_by_selected_item", filter_str)
-}
-async function generatePackButton(filter_str) {
-    let data = {
-        "set_name": document.getElementById("primary_card_set_title").innerText,
-        "filter_str": filter_str,
-        "card_name_search_query": document.getElementById("card_name_search_query_text_field").value,
-        "filter_ownership": document.getElementById("filter_ownership").textContent,
-        "user_id": 1
-    };
-    generatePack(data)
-}
 async function applySearchTerm() {
-    let data = {
-        "set_name": document.getElementById("primary_card_set_title").innerText,
-        "filter_str": document.getElementById("sort_by_selected_item").textContent,
-        "card_name_search_query": document.getElementById("card_name_search_query_text_field").value,
-        "filter_ownership": document.getElementById("filter_ownership").textContent
-    };
-    queryDB(data)
-}
-async function applySeasonSearchTerm() {
     let data = {
         "set_name": document.getElementById("primary_card_set_title").innerText,
         "filter_str": document.getElementById("sort_by_selected_item").textContent,
@@ -386,4 +363,5 @@ document.addEventListener("DOMContentLoaded", function(event){
 
     console.log(data)
     queryDB(data)
+    startCountdown();
 });
