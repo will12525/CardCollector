@@ -5,7 +5,8 @@ import pathlib
 import requests
 from bs4 import BeautifulSoup
 import re
-from . import common_objects
+from app.utils import common_objects
+from app.utils.common import Pack
 
 SET_HTMLS = "set_htmls/"
 SET_LIST_HTMLS = "set_list_htmls/"

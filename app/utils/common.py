@@ -1,6 +1,7 @@
+import datetime
 import random
 
-from database_handler import common_objects
+from app.utils import common_objects
 
 
 class Pack:
@@ -94,3 +95,22 @@ class Pack:
             reverse_foil["foil_type"] = "Reverse Holo"  # Set the foil type
 
         return [x for x in pulled_cards if x is not None]
+
+
+def can_user_open_pack(iso_string):
+    if not iso_string:
+        return True, None  # No previous action, user can proceed
+
+    last_open_time = datetime.datetime.fromisoformat(
+        iso_string.replace("Z", "+00:00")
+    )  # Convert ISO string to datetime
+    current_time = datetime.datetime.now(datetime.UTC)
+
+    # Calculate the next allowed time (1 hour after the last action)
+    next_allowed_time = last_open_time + datetime.timedelta(hours=1)
+
+    if current_time >= next_allowed_time:
+        return True, None  # User can proceed
+    else:
+        # Return the next allowed time as a timestamp (milliseconds since epoch)
+        return False, int(next_allowed_time.timestamp() * 1000)

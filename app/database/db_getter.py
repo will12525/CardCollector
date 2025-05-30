@@ -1,7 +1,7 @@
 import json
 import pathlib
 import datetime
-from . import common_objects
+from app.utils import common_objects
 from .db_access import DBConnection
 
 

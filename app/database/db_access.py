@@ -3,8 +3,8 @@ import traceback
 from contextlib import closing
 import sqlite3
 
-from . import common_objects
-from .common_objects import DBType
+from app.utils import common_objects
+from app.utils.common_objects import DBType
 
 sql_insert_user_info_table = f"INSERT INTO {common_objects.USER_INFO_TABLE} ({common_objects.USER_NAME_COLUMN}, {common_objects.USER_PASS_COLUMN}) VALUES (:{common_objects.USER_NAME_COLUMN}, :{common_objects.USER_PASS_COLUMN});"
 

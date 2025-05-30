@@ -4,11 +4,15 @@ venv/
 .venv/
 historical
 backups
-tests/downloaded_images
+old_tests/downloaded_images
 database_handler/downloaded_images
 data_files/
 **/*.ods
 **/*.xml
 *.db*
 auto_record/
-static/card_images/*.jpg
+app/static/card_images/*.jpg
+credentials.json
+*.zip
+*.gif
+custom_cards/

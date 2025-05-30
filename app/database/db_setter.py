@@ -1,6 +1,6 @@
 import json
-from . import common_objects
-from .db_access import DBConnection
+from app.utils import common_objects
+from app.database.db_access import DBConnection
 
 
 """
