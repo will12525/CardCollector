@@ -1,5 +1,9 @@
 import os
+import sys
 import pytest
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 
 DB_PATH = "pokemon_card_data.db"
 

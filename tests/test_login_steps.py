@@ -7,7 +7,6 @@ from flask.testing import FlaskClient
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 # Adjust the path to your app module if necessary
 from app import create_app
 
