@@ -1,11 +1,6 @@
-import sys
-
 import pytest
 from pytest_bdd import scenarios, given, when, then
-from flask import Flask
 from flask.testing import FlaskClient
-import sys
-import os
 
 # Adjust the path to your app module if necessary
 from app import create_app
@@ -55,10 +50,18 @@ def submit_invalid_login(client: FlaskClient):
     pytest.response = response
 
 
+@when("I submit invalid login password")
+def submit_invalid_login(client: FlaskClient):
+    response = client.post(
+        "/login", data={"username": "valid_user", "password": "wrong_pass"}
+    )
+    pytest.response = response
+
+
 @then("I should see a success message")
 def check_success_message():
     assert pytest.response.status_code == 200
-    assert b"Login Successful!" in pytest.response.data
+    assert b"Login successful!" in pytest.response.data
 
 
 @then("I should see an error message")
