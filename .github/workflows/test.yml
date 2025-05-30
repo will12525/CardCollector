@@ -36,3 +36,4 @@ jobs:
         if: success() || failure()
         with:
           report_paths: 'pytest-results.xml'
+          include_passed: true
