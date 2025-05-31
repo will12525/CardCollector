@@ -8,11 +8,6 @@ jobs:
       checks: write
     steps:
       - uses: actions/checkout@v4
-      - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.12.0
-        with:
-          mongodb-version: '8.0'
-          mongodb-replica-set: test-rs
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -22,8 +17,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Run Pytest and Generate JUnit Report
-        env:
-          MONGO_URI: mongodb://localhost:27017
         run: pytest --junitxml=pytest-results.xml
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
