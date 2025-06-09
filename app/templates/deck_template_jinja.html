@@ -28,7 +28,7 @@
         <div class="deck-image px-1">
             <img class="img-fluid" loading="lazy" data-collection-type="deck"
                  data-card-id="{{ card_data.get('id', null) }}"
-                 src="/static/card_images/{{ card_data['tcgp_id'] }}.jpg" onerror="apply_default_image(this)">
+                 src="https://tcgplayer-cdn.tcgplayer.com/product/{{ card_data['tcgp_id'] }}_200w.jpg">
             <span>{{ card_data.get('card_count', '') }}</span>
         </div>
         {% endfor %}

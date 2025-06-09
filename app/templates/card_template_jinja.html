@@ -24,7 +24,7 @@
             <img class="img-fluid" loading="lazy" data-collection-type="collection"
                  data-card-id="{{ card_data.get('id', null) }}"
                  data-user-collection-id="{{ card_data.get('user_collection_id', null) }}"
-                 src="/static/card_images/{{ card_data['tcgp_id'] }}.jpg" onerror="apply_default_image(this)">
+                 src="https://tcgplayer-cdn.tcgplayer.com/product/{{ card_data['tcgp_id'] }}_200w.jpg">
             <span>{{ card_data.get('own_count', '') }}</span>
         </div>
         {% endif %}

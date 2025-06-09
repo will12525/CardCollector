@@ -109,10 +109,6 @@ async function update_card_index(event) {
     response_data = fetchAndSetData(url, data)
 }
 
-async function apply_default_image(imageElement) {
-    imageElement.src = "http://192.168.1.175:8000/images/" + default_image_array[Math.floor(Math.random()*default_image_array.length)];
-}
-
 async function queryDB(data) {
     document.getElementById("rainbow_loading_bar").hidden = false
     const url = "/get_set_card_list_html";
