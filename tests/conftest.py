@@ -1,10 +1,9 @@
 import os
 import sys
 import pytest
-import time
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from app.database.db_setter import DBCreator
+from app.database.db_getter import DatabaseHandler
 
 DB_PATH = "pokemon_card_data.db"
 
@@ -14,9 +13,7 @@ def reset_db():
     if os.path.exists(DB_PATH):
         os.remove(DB_PATH)
     # Initialize database
-    with DBCreator() as db_connection:
-        db_connection.create_db()
-
-
-# Deletes the database file before test run
-# clean_database()
+    db_getter_connection = DatabaseHandler()
+    db_getter_connection.open()
+    db_getter_connection.create_db()
+    db_getter_connection.close()

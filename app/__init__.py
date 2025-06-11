@@ -1,7 +1,6 @@
-import os
 from flask import Flask
 from flask_minify import minify
-from app.database.db_setter import DBCreator
+from app.database.db_getter import DatabaseHandler
 from app.utils.common_objects import DBType
 
 
@@ -11,10 +10,11 @@ def create_app():
     minify(app=app, html=True, js=True, cssless=True)
     app.jinja_env.lstrip_blocks = True
     app.jinja_env.trim_blocks = True
-
     # Initialize database
-    with DBCreator(DBType.PHYSICAL) as db_connection:
-        db_connection.create_db()
+    db_handler = DatabaseHandler()
+    db_handler.open()
+    db_handler.create_db()
+    db_handler.close()
 
     # Register blueprints
     from app.routes import register_blueprints

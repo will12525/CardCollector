@@ -1,7 +1,8 @@
 # File: tests/test_mongo_db_handler.py
 
 import pytest
-from app.database.db_setter import DBCreator
+
+# from app.database.db_setter import DBCreator
 
 
 # def test_connect(mongo_handler):

@@ -1,12 +1,9 @@
 import sys
 import traceback
-from contextlib import closing
 import sqlite3
 
-from app.utils import common_objects
 from app.utils.common_objects import DBType
-
-sql_insert_user_info_table = f"INSERT INTO {common_objects.USER_INFO_TABLE} ({common_objects.USER_NAME_COLUMN}, {common_objects.USER_PASS_COLUMN}) VALUES (:{common_objects.USER_NAME_COLUMN}, :{common_objects.USER_PASS_COLUMN});"
+import app.database.db_queries as queries
 
 
 def print_db_traceback(error, message):
@@ -19,28 +16,9 @@ def print_db_traceback(error, message):
     print(message)
 
 
-def get_last_row_id(cursor) -> int:
-    if cursor.rowcount > 0:
-        return cursor.lastrowid
-
-
-def get_data_list(cursor) -> list[dict]:
-    return [dict(row) for row in cursor.fetchall()]
-
-
 class DBConnection:
     VERSION = 2
-    MEDIA_METADATA_DB_NAME = "pokemon_card_data.db"
-
-    __sql_create_version_info_table = f"""CREATE TABLE IF NOT EXISTS version_info (
-                                         {common_objects.ID_COLUMN} integer PRIMARY KEY,
-                                         version integer NOT NULL
-                                      );"""
-    __version_table_creation_script = [__sql_create_version_info_table]
-    __sql_insert_version_info_table = (
-        "INSERT INTO version_info(version) VALUES(:version_info);"
-    )
-    __version_info_query = "SELECT * FROM version_info;"
+    DB_FILE_NAME = "pokemon_card_data.db"
 
     connection = None
     db_type = None
@@ -48,12 +26,12 @@ class DBConnection:
     def __init__(self, db_type=DBType.PHYSICAL, file_name=None):
         self.db_type = db_type
         if file_name:
-            self.MEDIA_METADATA_DB_NAME = file_name
+            self.DB_FILE_NAME = file_name
 
-    def __enter__(self):
+    def open(self):
         try:
             if self.db_type == DBType.PHYSICAL:
-                self.connection = sqlite3.connect(self.MEDIA_METADATA_DB_NAME)
+                self.connection = sqlite3.connect(self.DB_FILE_NAME)
             elif self.db_type == DBType.MEMORY:
                 self.connection = sqlite3.connect(":memory:")
             else:
@@ -61,10 +39,8 @@ class DBConnection:
 
             if self.connection:
                 self.connection.row_factory = sqlite3.Row
-            # print(f"SqlLite version: {sqlite3.version}")
         except sqlite3.Error as e:
             print(f"Connection error: {e}")
-        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
@@ -76,35 +52,46 @@ class DBConnection:
         if self.connection:
             self.connection.close()
 
-    def execute_db_query(self, query, return_func, params=()):
+    def execute_db_query(self, query, cursor, params=()):
         if sqlite3.complete_statement(query):
-            with closing(self.connection.cursor()) as cursor:
-                try:
-                    cursor.execute(query, params)
-                    self.connection.commit()
-                    return return_func(cursor)
-                except sqlite3.Error as error:
-                    print_db_traceback(error, f"Error: Query: {query} Params: {params}")
-                    return []
+            try:
+                cursor.execute(query, params)
+                self.connection.commit()
+            except sqlite3.Error as error:
+                print_db_traceback(error, f"Error: Query: {query} Params: {params}")
 
     def execute_db_script(self, db_script_lines: list):
+        ret_val = 0
         db_script_lines.insert(0, "BEGIN;")
         db_script_lines.append("COMMIT;")
         db_script = "".join(db_script_lines)
         if sqlite3.complete_statement(db_script):
-            with closing(self.connection.cursor()) as cursor:
-                try:
-                    cursor.executescript(db_script)
-                    self.connection.commit()
-                    return get_last_row_id(cursor)
-                except sqlite3.Error as error:
-                    print_db_traceback(error, f"Error creating tables:\n{db_script}")
+            cursor = self.connection.cursor()
+            try:
+                cursor.executescript(db_script)
+                self.connection.commit()
+                if cursor.rowcount > 0:
+                    ret_val = cursor.lastrowid
+            except sqlite3.Error as error:
+                print_db_traceback(error, f"Error creating tables:\n{db_script}")
+            cursor.close()
+            return ret_val
 
     def add_data_to_db(self, query, params):
-        return self.execute_db_query(query, get_last_row_id, params)
+        ret_val = 0
+        cursor = self.connection.cursor()
+        self.execute_db_query(query, cursor, params)
+        if cursor.rowcount > 0:
+            ret_val = cursor.lastrowid
+        cursor.close()
+        return ret_val
 
     def get_data_from_db(self, query, params=()):
-        return self.execute_db_query(query, get_data_list, params)
+        cursor = self.connection.cursor()
+        self.execute_db_query(query, cursor, params)
+        ret_val = [dict(row) for row in cursor.fetchall()]
+        cursor.close()
+        return ret_val
 
     def get_data_from_db_first_result(self, query, params=()) -> dict:
         if query_result := self.get_data_from_db(query, params):
@@ -115,19 +102,18 @@ class DBConnection:
         return self.get_data_from_db_first_result(query, params).get(item)
 
     def get_row_id(self, query: str, params):
-        return self.get_row_item(query, params, common_objects.ID_COLUMN)
+        return self.get_row_item(query, params, "id")
 
     def check_db_version(self):
-        if not (version := self.get_row_item(self.__version_info_query, (), "version")):
-            self.execute_db_script(self.__version_table_creation_script)
+        if not (
+            version := self.get_data_from_db_first_result(queries.version_info_query)
+        ):
+            self.execute_db_script([queries.sql_create_version_info_table])
             self.add_data_to_db(
-                self.__sql_insert_version_info_table, {"version_info": self.VERSION}
+                queries.sql_insert_version_info_table, {"version_info": self.VERSION}
             )
             print(
-                f"Version: {self.get_row_item(self.__version_info_query, (), 'version')}"
+                f"Version: {self.get_data_from_db_first_result(queries.version_info_query)}"
             )
             version = self.VERSION
         return version
-
-    def add_user(self, params):
-        return self.add_data_to_db(sql_insert_user_info_table, params)

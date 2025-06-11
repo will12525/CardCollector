@@ -1,5 +1,3 @@
-import json
-import os
 import pathlib
 
 import requests
@@ -188,7 +186,7 @@ class SetListSetData:
         for card in self.card_list:
             if card.card_name == card_name:
                 ret_list.append(card)
-            # elif card_name in card.get(common_objects.CARD_NAME_COLUMN):
+            # elif card_name in card.get("card_name"):
             #     ret_list.append(card)
         # if len(ret_list) == 0:
         #     print("Break")
@@ -250,7 +248,7 @@ class SetListSetData:
             #                     common_objects.CARD_INDEX_COLUMN
             #                 ),
             #                 common_objects.SET_ID_COLUMN: set_item.get(
-            #                     common_objects.ID_COLUMN
+            #                     "id"
             #                 ),
             #             }
             #     ):
@@ -449,14 +447,14 @@ class CardData:
 
     def to_dict(self):
         card_dict = {
-            common_objects.CARD_NAME_COLUMN: self.card_name,
-            common_objects.CARD_TYPE_COLUMN: self.card_type,
-            common_objects.CARD_RARITY_COLUMN: self.rarity,
-            common_objects.CARD_INDEX_COLUMN: self.card_index,
-            common_objects.SET_ID_COLUMN: self.set_id,
-            common_objects.TCGP_ID_COLUMN: self.tcgp_id,
-            common_objects.TCGP_PATH_COLUMN: self.tcgp_path,
-            common_objects.CARD_CLASS_COLUMN: self.card_class,
+            "card_name": self.card_name,
+            "card_type": self.card_type,
+            "card_rarity": self.rarity,
+            "card_index": self.card_index,
+            "id": self.set_id,
+            "tcgp_id": self.tcgp_id,
+            "tcgp_path": self.tcgp_path,
+            "card_class": self.card_class,
         }
         # card_dict.update(self.card_set.to_dict())
         return card_dict

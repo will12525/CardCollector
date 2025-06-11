@@ -1,60 +1,7 @@
 # Table names
 from enum import Enum, auto
 
-ID_COLUMN = "id"
-
-
-CARD_INFO_TABLE = "card_info"
-CARD_NAME_COLUMN = "card_name"
-CARD_TYPE_COLUMN = "card_type"
-CARD_TYPE2_COLUMN = "card_type2"
-CARD_RARITY_COLUMN = "card_rarity"
-CARD_INDEX_COLUMN = "card_index"
-TCGP_ID_COLUMN = "tcgp_id"
-TCGP_PATH_COLUMN = "tcgp_path"
-SET_ID_COLUMN = "set_id"
-CARD_CLASS_COLUMN = "card_class"
-CARD_ATTACK_COLUMN = "attack_info"
-CARD_ENERGY_COST_COLUMN = "energy_cost"
-CARD_TEXT_COLUMN = "card_text"
-
-SET_INFO_TABLE = "set_info"
-SET_NAME_COLUMN = "set_name"
-SET_INDEX_COLUMN = "set_index"
-SET_CARD_COUNT_COLUMN = "set_card_count"
-
-USER_STATS_TABLE = "user_stats"
-USER_INFO_TABLE = "user_info"
-USER_NAME_COLUMN = "user_name"
-USER_PASS_COLUMN = "user_pass_hash"
-LAST_PACK_OPEN_TIME_COLUMN = "last_pack_open_time"
-LAST_SET_NAME_COLUMN = "last_set_name"
-LAST_DECK_ID_COLUMN = "last_deck_id"
-
-
-USER_COLLECTION_TABLE = "user_collection"
-USER_ID_COLUMN = "user_id"
-CARD_ID_COLUMN = "card_id"
-OWN_COUNT_COLUMN = "own_count"
-STATE_WANT_COLUMN = "state_want"
-STATE_GIFT_COLUMN = "state_gift"
-
-PRICE_COLUMN = "price"
-
 USER_PACK_DELAY = 1  # Hour
-
-default_card_dict = {
-    CARD_NAME_COLUMN: "",
-    SET_NAME_COLUMN: "",
-    SET_ID_COLUMN: "",
-    SET_INDEX_COLUMN: 0,
-    CARD_TYPE_COLUMN: "",
-    CARD_RARITY_COLUMN: "",
-    CARD_INDEX_COLUMN: None,
-    TCGP_ID_COLUMN: 0,
-    TCGP_PATH_COLUMN: "",
-    CARD_CLASS_COLUMN: "",
-}
 
 
 class DeckBuilderActions(Enum):

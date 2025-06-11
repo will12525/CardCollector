@@ -20,15 +20,17 @@ def register():
             "password": request.form["password"],
         }
 
-        with DatabaseHandler() as db_getter_connection:
-            if db_getter_connection.get_user_id(db_request):
-                response_message = ERR_MSG_USERNAME_EXISTS
-            else:
-                db_request["user_pass_hash"] = generate_password_hash(
-                    db_request["password"]
-                )
-                if db_getter_connection.add_user(db_request):
-                    response_message = ERR_MSG_REGISTRATION_SUCCESS
+        db_getter_connection = DatabaseHandler()
+        db_getter_connection.open()
+        if db_getter_connection.get_user_id(db_request):
+            response_message = ERR_MSG_USERNAME_EXISTS
+        else:
+            db_request["user_pass_hash"] = generate_password_hash(
+                db_request["password"]
+            )
+            if db_getter_connection.add_user(db_request):
+                response_message = ERR_MSG_REGISTRATION_SUCCESS
+        db_getter_connection.close()
 
     return response_message, 200
 
@@ -38,18 +40,16 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-
-        with DatabaseHandler() as db_getter_connection:
-            if user_data := db_getter_connection.get_user_hash(
-                {
-                    "user_name": username,
-                }
-            ):
-                if check_password_hash(user_data.get("user_pass_hash"), password):
-                    session["user_id"] = user_data.get("id")
-                    session["username"] = username
-                    return ERR_MSG_LOGIN_SUCCESS, 200
-
+        db_getter_connection = DatabaseHandler()
+        db_getter_connection.open()
+        if user_data := db_getter_connection.get_user_hash({"user_name": username}):
+            if check_password_hash(user_data.get("user_pass_hash"), password):
+                session["user_id"] = user_data.get("id")
+                session["username"] = username
+                print("User logged in:", username)
+                db_getter_connection.close()
+                return ERR_MSG_LOGIN_SUCCESS, 200
+        db_getter_connection.close()
         return ERR_MSG_INVALID_CREDENTIALS, 200
 
     return render_template("login.html")
