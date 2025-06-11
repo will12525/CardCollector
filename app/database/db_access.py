@@ -78,7 +78,7 @@ class DBConnection:
             return ret_val
 
     def add_data_to_db(self, query, params):
-        ret_val = 0
+        ret_val = None
         cursor = self.connection.cursor()
         self.execute_db_query(query, cursor, params)
         if cursor.rowcount > 0:

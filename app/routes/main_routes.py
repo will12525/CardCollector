@@ -97,6 +97,7 @@ def generate_pack():
             pack = Pack(set_card_list)
             data["set_card_list"] = pack.open()
             # Update user collection with the new pack data
+            print(data["set_card_list"])
             for card in data["set_card_list"]:
                 card["card_id"] = card["id"]
                 card["user_id"] = session.get("user_id")
