@@ -107,7 +107,7 @@ def can_user_open_pack(iso_string):
     current_time = datetime.datetime.now(datetime.UTC)
 
     # Calculate the next allowed time (1 hour after the last action)
-    next_allowed_time = last_open_time + datetime.timedelta(hours=1)
+    next_allowed_time = last_open_time + datetime.timedelta(minutes=1)
 
     if current_time >= next_allowed_time:
         return True, None  # User can proceed

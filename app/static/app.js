@@ -11,6 +11,45 @@ String.prototype.toHHMMSS = function () {
     if (seconds < 10) {seconds = "0"+seconds;}
     return hours+":"+minutes+":"+seconds;
 };
+/**
+ * A utility object for managing cookies.
+ * Provides getter and setter functions to easily access and modify cookies.
+ */
+const cookieManager = {
+  /**
+   * Sets a cookie with a given name, value, and optional expiration days.
+   * @param {string} name - The name of the cookie.
+   * @param {string} value - The value to store in the cookie.
+   * @param {number} [days] - The number of days until the cookie expires. If not provided, it's a session cookie.
+   */
+  set: function(name, value, days) {
+    let expires = "";
+    if (days) {
+      const date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+  },
+
+  /**
+   * Gets the value of a cookie with a given name.
+   * @param {string} name - The name of the cookie to retrieve.
+   * @returns {string|null} The value of the cookie, or null if the cookie is not found.
+   */
+  get: function(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) {
+        return c.substring(nameEQ.length, c.length);
+      }
+    }
+    return null;
+  }
+};
 
 function formatFloatToTwoDecimals(value) {
     // Handle different input types
@@ -263,10 +302,11 @@ async function applySortFilter(filter_str) {
     updateSpanText("sort_by_selected_item", filter_str)
 }
 async function generatePackButton() {
+    let set_name = document.getElementById("primary_card_set_title").innerText
     let data = {
-        "set_name": document.getElementById("primary_card_set_title").innerText,
+        "set_name": set_name
     };
-
+    cookieManager.set("set_name", set_name);
     let response = await fetch("/generate_pack", {
         "method": "POST",
         "headers": {"Content-Type": "application/json"},
@@ -330,8 +370,13 @@ async function getSetCardList(set_name) {
 };
 
 document.addEventListener("DOMContentLoaded", function(event){
+    let set_name = cookieManager.get("set_name");
+    if (set_name === null) {
+        set_name = "Base Set (Shadowless)"
+    }
+    document.getElementById("primary_card_set_title").innerText = set_name
     let data = {
-        "set_name": "Base Set (Shadowless)",
+        "set_name": set_name,
         "filter_str": document.getElementById("sort_by_selected_item").textContent,
         "card_name_search_query": "",
         "filter_ownership": ""
