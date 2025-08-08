@@ -131,7 +131,22 @@ add_card_to_user_collection = f"INSERT INTO user_collection (user_id, card_id, o
 get_all_card_data = (
     f"SELECT * FROM card_info INNER JOIN set_info ON card_info.set_id = set_info.id;"
 )
-get_all_set_card_data = f"SELECT * FROM card_info INNER JOIN set_info ON card_info.set_id = set_info.id LEFT JOIN user_collection ON card_info.id = user_collection.card_id AND user_collection.user_id = :user_id WHERE set_name=:set_name;"
+get_all_user_set_card_data = f"SELECT * FROM card_info INNER JOIN set_info ON card_info.set_id = set_info.id LEFT JOIN user_collection ON card_info.id = user_collection.card_id AND user_collection.user_id = :user_id WHERE set_name=:set_name;"
+get_all_set_card_data = f"SELECT tcgp_path, card_name, card_class, card_type, card_rarity, card_text, attack_info, card_index, energy_cost, tcgp_id, card_info.id AS id FROM card_info INNER JOIN set_info ON card_info.set_id = set_info.id WHERE set_name=:set_name {sort_index_asc};"
+
+update_card_info_query = """
+    UPDATE card_info
+    SET 
+        card_name = :card_name,
+        card_class = :card_class,
+        card_type = :card_type,
+        card_rarity = :card_rarity,
+        card_text = :card_text,
+        attack_info = :attack_info,
+        card_index = :card_index,
+        energy_cost = :energy_cost
+    WHERE id = :id;
+"""
 
 """
 PACK GENERATION QUERIES

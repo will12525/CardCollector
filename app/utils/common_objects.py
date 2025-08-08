@@ -205,15 +205,18 @@ tcgp_set_info = {
 }
 
 creature_types = [
-    "darkness",
-    # "metal",
-    "fighting",
-    "fire",
-    "grass",
-    "lightning",
-    "psychic",
-    "water",
-    "rainbow",
+    "Darkness",
+    "Metal",
+    "Dragon",
+    "Fighting",
+    "Fire",
+    "Grass",
+    "Lightning",
+    "Psychic",
+    "Water",
+    "Fairy",
+    "Colorless",
+    "Rainbow",
 ]
 
 

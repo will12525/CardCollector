@@ -3,7 +3,12 @@ import json
 from app.utils.decorators import login_required
 from app.database.db_getter import DatabaseHandler
 from app.utils.common import can_user_open_pack, Pack
-from app.utils.common_objects import get_set_name_from_index
+from app.utils.common_objects import (
+    get_set_name_from_index,
+    card_rarities,
+    rare_sub_types,
+    creature_types,
+)
 
 main_bp = Blueprint("main", __name__)
 
@@ -27,6 +32,67 @@ def index():
     return render_template(
         "index.html", username=session.get("username"), python_metadata=python_metadata
     )
+
+
+@main_bp.route("/editor")
+@login_required
+def editor():
+    print(session.get("username"), "----------------------index----------------------")
+    db_getter_connection = DatabaseHandler()
+    db_getter_connection.open()
+    python_metadata = {
+        "set_list": db_getter_connection.get_sets(),
+    }
+    db_getter_connection.close()
+
+    return render_template(
+        "editor.html", username=session.get("username"), python_metadata=python_metadata
+    )
+
+
+@main_bp.route("/editor/load_set", methods=["POST"])
+@login_required
+def load_set():
+    print(session.get("username"), "----------------------LOAD----------------------")
+    if json_request := request.get_json():
+        if set_name := json_request.get("set_name"):
+            card_rarity_list = list(card_rarities.keys())
+            card_rarity_list.extend(list(rare_sub_types.keys()))
+            db_getter_connection = DatabaseHandler()
+            db_getter_connection.open()
+            data = {
+                "set_cards": db_getter_connection.get_all_set_card_data(set_name),
+                "card_rarity": card_rarity_list,
+                "card_type": creature_types,
+                "fields": [
+                    "tcgp_path",
+                    "card_name",
+                    "card_class",
+                    "card_type",
+                    "card_rarity",
+                    "card_index",
+                    "card_text",
+                    "attack_info",
+                    "energy_cost",
+                ],
+            }
+            print(data["set_cards"])
+            db_getter_connection.close()
+            return jsonify(data), 200
+
+
+@main_bp.route("/editor/save_set", methods=["POST"])
+@login_required
+def save_set():
+    print(session.get("username"), "----------------------SAVE----------------------")
+    if session.get("username") in ["Willow"]:
+        if json_request := request.get_json():
+            print(json_request)
+            db_getter_connection = DatabaseHandler()
+            db_getter_connection.open()
+            db_getter_connection.update_card_info(json_request)
+            db_getter_connection.close()
+    return jsonify({}), 200
 
 
 @main_bp.route("/get_set_card_list_html", methods=["POST"])
@@ -93,7 +159,7 @@ def generate_pack():
             db_getter_connection.set_user_pack_time(
                 session.get("username"), session.get("user_id")
             )
-            set_card_list = db_getter_connection.get_all_set_card_data(db_request)
+            set_card_list = db_getter_connection.get_all_user_set_card_data(db_request)
             pack = Pack(set_card_list)
             data["set_card_list"] = pack.open()
             # Update user collection with the new pack data

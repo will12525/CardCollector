@@ -87,12 +87,22 @@ class DatabaseHandler(DBConnection):
     def get_all_card_data(self):
         return self.get_data_from_db(queries.get_all_card_data)
 
-    def get_all_set_card_data(self, params):
+    def get_all_user_set_card_data(self, params):
         # print(params)
         return self.get_data_from_db(
-            queries.get_all_set_card_data,
+            queries.get_all_user_set_card_data,
             params,
         )
+
+    def get_all_set_card_data(self, set_name):
+        return self.get_data_from_db(
+            queries.get_all_set_card_data,
+            {"set_name": set_name},
+        )
+
+    def update_card_info(self, card_list):
+        for card in card_list:
+            self.add_data_to_db(queries.update_card_info_query, card)
 
     def query_collection(
         self,

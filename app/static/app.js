@@ -164,6 +164,157 @@ async function queryDB(data) {
     document.getElementById("rainbow_loading_bar").hidden = true
 }
 
+function createEditableTable(set_name, jsonData) {
+    let set_cards = jsonData["set_cards"]; // Store the JSON data globally for further use
+    // Create a container for the table and save button
+    const container = document.createElement('div');
+
+    // Create the table element
+    const table = document.createElement('table');
+    table.border = '1';
+
+    // Extract unique keys for table headers
+    const fields = jsonData["fields"]
+
+    // Create the table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    fields.forEach(field => {
+        const th = document.createElement('th');
+        th.textContent = field;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Create the table body
+    const tbody = document.createElement('tbody');
+    set_cards.forEach((row, rowIndex) => {
+        const tr = document.createElement('tr');
+        tr.dataset.card_id = row["id"];
+        fields.forEach(key => {
+            const td = document.createElement('td');
+
+            if (key === 'card_class') { // Example: Make 'card_class' a dropdown
+                const select = document.createElement('select');
+                ['creature', 'trainer', 'energy'].forEach(optionValue => {
+                    const option = document.createElement('option');
+                    option.value = optionValue;
+                    option.textContent = optionValue;
+                    select.appendChild(option);
+                });
+                select.value = row[key]; // Set the current value
+                select.dataset.key = key;
+                select.dataset.rowIndex = rowIndex;
+                td.appendChild(select);
+                tr.appendChild(td);
+            } else if (key === 'card_rarity') { // Example: Make 'card_class' a dropdown
+                const select = document.createElement('select');
+                jsonData["card_rarity"].forEach(optionValue => {
+                    const option = document.createElement('option');
+                    option.value = optionValue;
+                    option.textContent = optionValue;
+                    select.appendChild(option);
+                });
+                select.value = row[key]; // Set the current value
+                select.dataset.key = key;
+                select.dataset.rowIndex = rowIndex;
+                td.appendChild(select);
+                tr.appendChild(td);
+            } else if (key === 'card_type') { // Example: Make 'card_class' a dropdown
+                const select = document.createElement('select');
+                jsonData["card_type"].forEach(optionValue => {
+                    const option = document.createElement('option');
+                    option.value = optionValue;
+                    option.textContent = optionValue;
+                    select.appendChild(option);
+                });
+                select.value = row[key]; // Set the current value
+                select.dataset.key = key;
+                select.dataset.rowIndex = rowIndex;
+                td.appendChild(select);
+            } else if (key === 'id' || key === 'tcgp_id' || key === 'set_id' || key === 'set_index' || key === 'set_name' || key === 'set_card_count') { // Example: Disable 'id' and 'tcgp_id'
+                const input = document.createElement('input');
+                input.value = row[key];
+                input.type = typeof row[key] === 'number' ? 'number' : 'text';
+                input.disabled = true; // Disable the field
+                td.appendChild(input);
+                tr.appendChild(td);
+            } else if (key === 'tcgp_path') { // Display an image and make it clickable
+                const link = document.createElement('a');
+                let url = `https://www.tcgplayer.com/product/${row['tcgp_id']}/pokemon-${row[key]}`;
+                link.href = url; // Set the URL
+                link.target = '_blank'; // Open in a new tab
+                let img_url = `https://tcgplayer-cdn.tcgplayer.com/product/${row['tcgp_id']}_200w.jpg`
+                const img = document.createElement('img');
+                img.src = img_url; // Set the image source
+                img.alt = 'Image'; // Set alt text for accessibility
+                img.style.width = '70px'; // Adjust image size
+                img.style.height = '100px';
+
+                link.appendChild(img);
+                td.appendChild(link);
+                tr.insertBefore(td, tr.firstChild);
+            } else {
+                const input = document.createElement('input');
+                input.value = row[key];
+                input.type = typeof row[key] === 'number' ? 'number' : 'text';
+                input.dataset.key = key;
+                input.dataset.rowIndex = rowIndex;
+                td.appendChild(input);
+                tr.appendChild(td);
+            }
+            tr.appendChild(td);
+
+        });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    // Create the save button
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Save';
+    saveButton.addEventListener('click', () => {
+        const updatedData = [];
+        tbody.querySelectorAll('tr').forEach((tr, rowIndex) => {
+            const rowData = {};
+            rowData["id"] = parseFloat(tr.dataset.card_id)
+            tr.querySelectorAll('input, select').forEach(element => {
+                const key = element.dataset.key;
+                const value = element.tagName === 'SELECT' ? element.value :
+                              element.type === 'number' ? parseFloat(element.value) : element.value;
+                rowData[key] = isNaN(value) ? element.value : value; // Ensure integers remain integers
+            });
+            updatedData.push(rowData);
+        });
+        response_data = fetchAndSetData("/editor/save_set", updatedData);
+        console.log(updatedData); // Replace this with a function to update the database
+        console.log(response_data); // Replace this with a function to update the database
+    });
+
+    // Append the table and button to the container
+    container.appendChild(saveButton);
+    container.appendChild(table);
+
+    // Append the container to the body or a specific element
+    document.getElementById("card_container").innerHTML = "";
+    document.getElementById("card_container").appendChild(container);
+    document.getElementById("rainbow_loading_bar").hidden = true
+
+}
+function load_set(set_name){
+    var url = "/editor/load_set";
+    response_data = fetchAndSetData(url, {"set_name": set_name})
+    response_data.then(data => {
+        if (data) {
+            createEditableTable(set_name, data);
+        } else {
+            console.error("No set data found or invalid response format.");
+        }
+    });
+    cookieManager.set("set_name", set_name);
+    document.getElementById("primary_card_set_title").textContent = set_name;
+}
 function handleImageClick(imgElement) {
     const imageType = imgElement.getAttribute("data-collection-type");
     // Perform actions with the imgElement
@@ -359,6 +510,7 @@ async function applyFilterOwnership(filter_ownership) {
     queryDB(data)
 }
 async function getSetCardList(set_name) {
+    cookieManager.set("set_name", set_name);
     let data = {
         "set_name": set_name,
         "filter_str": document.getElementById("sort_by_selected_item").textContent,
@@ -375,34 +527,39 @@ document.addEventListener("DOMContentLoaded", function(event){
         set_name = "Base Set (Shadowless)"
     }
     document.getElementById("primary_card_set_title").innerText = set_name
-    let data = {
-        "set_name": set_name,
-        "filter_str": document.getElementById("sort_by_selected_item").textContent,
-        "card_name_search_query": "",
-        "filter_ownership": ""
-    };
 
-    var open_deck_builder_button = document.getElementById("open_deck_builder_button");
-    if (open_deck_builder_button !== null)
-    {
-        open_deck_builder_button.addEventListener("click", function(e) {
-            let deck_navbar = document.getElementById("deck_navbar")
-            if (deck_navbar.hidden) {
-                loadDeck();
-            } else {
-                deck_navbar.hidden = true
+    if (window.location.pathname === "/editor") {
+        load_set(set_name)
+    } else {
+        let data = {
+            "set_name": set_name,
+            "filter_str": document.getElementById("sort_by_selected_item").textContent,
+            "card_name_search_query": "",
+            "filter_ownership": ""
+        };
+
+        var open_deck_builder_button = document.getElementById("open_deck_builder_button");
+        if (open_deck_builder_button !== null)
+        {
+            open_deck_builder_button.addEventListener("click", function(e) {
+                let deck_navbar = document.getElementById("deck_navbar")
+                if (deck_navbar.hidden) {
+                    loadDeck();
+                } else {
+                    deck_navbar.hidden = true
+                }
+            });
+        }
+
+        document.addEventListener("click", function(event) {
+            if (event.target.tagName === "IMG") {
+                handleImageClick(event.target);
             }
         });
+    //    loadDeck();
+
+        console.log(data)
+        queryDB(data)
+        startCountdown();
     }
-
-    document.addEventListener("click", function(event) {
-        if (event.target.tagName === "IMG") {
-            handleImageClick(event.target);
-        }
-    });
-//    loadDeck();
-
-    console.log(data)
-    queryDB(data)
-    startCountdown();
 });
