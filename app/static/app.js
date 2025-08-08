@@ -288,7 +288,6 @@ function createEditableTable(set_name, jsonData) {
             updatedData.push(rowData);
         });
         response_data = fetchAndSetData("/editor/save_set", updatedData);
-        console.log(updatedData); // Replace this with a function to update the database
         console.log(response_data); // Replace this with a function to update the database
     });
 

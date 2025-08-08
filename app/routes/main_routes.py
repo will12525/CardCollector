@@ -76,7 +76,6 @@ def load_set():
                     "energy_cost",
                 ],
             }
-            print(data["set_cards"])
             db_getter_connection.close()
             return jsonify(data), 200
 
@@ -87,7 +86,6 @@ def save_set():
     print(session.get("username"), "----------------------SAVE----------------------")
     if session.get("username") in ["Willow"]:
         if json_request := request.get_json():
-            print(json_request)
             db_getter_connection = DatabaseHandler()
             db_getter_connection.open()
             db_getter_connection.update_card_info(json_request)
