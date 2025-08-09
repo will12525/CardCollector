@@ -179,9 +179,30 @@ function createEditableTable(set_name, jsonData) {
     // Create the table header
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
-    fields.forEach(field => {
+    fields.forEach((field, index) => {
         const th = document.createElement('th');
         th.textContent = field;
+        th.style.cursor = 'pointer'; // Indicate that the header is clickable
+
+        // Add sorting functionality
+        th.addEventListener('click', () => {
+            const isAscending = th.dataset.sortOrder !== 'asc';
+            th.dataset.sortOrder = isAscending ? 'asc' : 'desc';
+
+            // Sort rows based on the column
+            set_cards.sort((a, b) => {
+                const valA = a[field];
+                const valB = b[field];
+
+                if (valA < valB) return isAscending ? -1 : 1;
+                if (valA > valB) return isAscending ? 1 : -1;
+                return 0;
+            });
+
+            // Re-render the table body
+            renderTableBody();
+        });
+
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -189,87 +210,92 @@ function createEditableTable(set_name, jsonData) {
 
     // Create the table body
     const tbody = document.createElement('tbody');
-    set_cards.forEach((row, rowIndex) => {
-        const tr = document.createElement('tr');
-        tr.dataset.card_id = row["id"];
-        fields.forEach(key => {
-            const td = document.createElement('td');
-
-            if (key === 'card_class') { // Example: Make 'card_class' a dropdown
-                const select = document.createElement('select');
-                ['creature', 'trainer', 'energy'].forEach(optionValue => {
-                    const option = document.createElement('option');
-                    option.value = optionValue;
-                    option.textContent = optionValue;
-                    select.appendChild(option);
-                });
-                select.value = row[key]; // Set the current value
-                select.dataset.key = key;
-                select.dataset.rowIndex = rowIndex;
-                td.appendChild(select);
-                tr.appendChild(td);
-            } else if (key === 'card_rarity') { // Example: Make 'card_class' a dropdown
-                const select = document.createElement('select');
-                jsonData["card_rarity"].forEach(optionValue => {
-                    const option = document.createElement('option');
-                    option.value = optionValue;
-                    option.textContent = optionValue;
-                    select.appendChild(option);
-                });
-                select.value = row[key]; // Set the current value
-                select.dataset.key = key;
-                select.dataset.rowIndex = rowIndex;
-                td.appendChild(select);
-                tr.appendChild(td);
-            } else if (key === 'card_type') { // Example: Make 'card_class' a dropdown
-                const select = document.createElement('select');
-                jsonData["card_type"].forEach(optionValue => {
-                    const option = document.createElement('option');
-                    option.value = optionValue;
-                    option.textContent = optionValue;
-                    select.appendChild(option);
-                });
-                select.value = row[key]; // Set the current value
-                select.dataset.key = key;
-                select.dataset.rowIndex = rowIndex;
-                td.appendChild(select);
-            } else if (key === 'id' || key === 'tcgp_id' || key === 'set_id' || key === 'set_index' || key === 'set_name' || key === 'set_card_count') { // Example: Disable 'id' and 'tcgp_id'
-                const input = document.createElement('input');
-                input.value = row[key];
-                input.type = typeof row[key] === 'number' ? 'number' : 'text';
-                input.disabled = true; // Disable the field
-                td.appendChild(input);
-                tr.appendChild(td);
-            } else if (key === 'tcgp_path') { // Display an image and make it clickable
-                const link = document.createElement('a');
-                let url = `https://www.tcgplayer.com/product/${row['tcgp_id']}/pokemon-${row[key]}`;
-                link.href = url; // Set the URL
-                link.target = '_blank'; // Open in a new tab
-                let img_url = `https://tcgplayer-cdn.tcgplayer.com/product/${row['tcgp_id']}_200w.jpg`
-                const img = document.createElement('img');
-                img.src = img_url; // Set the image source
-                img.alt = 'Image'; // Set alt text for accessibility
-                img.style.width = '70px'; // Adjust image size
-                img.style.height = '100px';
-
-                link.appendChild(img);
-                td.appendChild(link);
-                tr.insertBefore(td, tr.firstChild);
-            } else {
-                const input = document.createElement('input');
-                input.value = row[key];
-                input.type = typeof row[key] === 'number' ? 'number' : 'text';
-                input.dataset.key = key;
-                input.dataset.rowIndex = rowIndex;
-                td.appendChild(input);
-                tr.appendChild(td);
-            }
-            tr.appendChild(td);
-
-        });
-        tbody.appendChild(tr);
-    });
     table.appendChild(tbody);
+
+    function renderTableBody() {
+        tbody.innerHTML = ''; // Clear existing rows
+        set_cards.forEach((row, rowIndex) => {
+            const tr = document.createElement('tr');
+            tr.dataset.card_id = row["id"];
+            fields.forEach(key => {
+                const td = document.createElement('td');
+
+                if (key === 'card_class') { // Example: Make 'card_class' a dropdown
+                    const select = document.createElement('select');
+                    ['creature', 'trainer', 'energy'].forEach(optionValue => {
+                        const option = document.createElement('option');
+                        option.value = optionValue;
+                        option.textContent = optionValue;
+                        select.appendChild(option);
+                    });
+                    select.value = row[key]; // Set the current value
+                    select.dataset.key = key;
+                    select.dataset.rowIndex = rowIndex;
+                    td.appendChild(select);
+                    tr.appendChild(td);
+                } else if (key === 'card_rarity') { // Example: Make 'card_class' a dropdown
+                    const select = document.createElement('select');
+                    jsonData["card_rarity"].forEach(optionValue => {
+                        const option = document.createElement('option');
+                        option.value = optionValue;
+                        option.textContent = optionValue;
+                        select.appendChild(option);
+                    });
+                    select.value = row[key]; // Set the current value
+                    select.dataset.key = key;
+                    select.dataset.rowIndex = rowIndex;
+                    td.appendChild(select);
+                    tr.appendChild(td);
+                } else if (key === 'card_type') { // Example: Make 'card_class' a dropdown
+                    const select = document.createElement('select');
+                    jsonData["card_type"].forEach(optionValue => {
+                        const option = document.createElement('option');
+                        option.value = optionValue;
+                        option.textContent = optionValue;
+                        select.appendChild(option);
+                    });
+                    select.value = row[key]; // Set the current value
+                    select.dataset.key = key;
+                    select.dataset.rowIndex = rowIndex;
+                    td.appendChild(select);
+                } else if (key === 'id' || key === 'tcgp_id' || key === 'set_id' || key === 'set_index' || key === 'set_name' || key === 'set_card_count') { // Example: Disable 'id' and 'tcgp_id'
+                    const input = document.createElement('input');
+                    input.value = row[key];
+                    input.type = typeof row[key] === 'number' ? 'number' : 'text';
+                    input.disabled = true; // Disable the field
+                    td.appendChild(input);
+                    tr.appendChild(td);
+                } else if (key === 'tcgp_path') { // Display an image and make it clickable
+                    const link = document.createElement('a');
+                    let url = `https://www.tcgplayer.com/product/${row['tcgp_id']}/pokemon-${row[key]}`;
+                    link.href = url; // Set the URL
+                    link.target = '_blank'; // Open in a new tab
+                    let img_url = `https://tcgplayer-cdn.tcgplayer.com/product/${row['tcgp_id']}_200w.jpg`
+                    const img = document.createElement('img');
+                    img.src = img_url; // Set the image source
+                    img.alt = 'Image'; // Set alt text for accessibility
+                    img.style.width = '70px'; // Adjust image size
+                    img.style.height = '100px';
+
+                    link.appendChild(img);
+                    td.appendChild(link);
+                    tr.insertBefore(td, tr.firstChild);
+                } else {
+                    const input = document.createElement('input');
+                    input.value = row[key];
+                    input.type = typeof row[key] === 'number' ? 'number' : 'text';
+                    input.dataset.key = key;
+                    input.dataset.rowIndex = rowIndex;
+                    td.appendChild(input);
+                    tr.appendChild(td);
+                }
+                tr.appendChild(td);
+
+            });
+            tbody.appendChild(tr);
+        });
+    }
+    renderTableBody();
 
     // Create the save button
     const saveButton = document.createElement('button');
